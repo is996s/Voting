@@ -41,6 +41,18 @@ void Timer0Interrupt(void) __interrupt (INT_NO_TMR0)
     }
 }
 
+void Uart0_ISR(void) __interrupt (INT_NO_UART0)
+{
+    if (RI){
+        uart0IntRxHandler();        
+        RI =0;
+    }
+    if (TI){
+        uart0IntTxHandler();
+        TI =0;
+    }
+}
+
 int main(void)
 {
 	init();

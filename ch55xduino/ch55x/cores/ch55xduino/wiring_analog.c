@@ -25,7 +25,7 @@ uint8_t analogRead(uint8_t pin)
 // hardware support.  These are defined in the appropriate
 // pins_*.c file.  For the rest of the pins, we default
 // to digital output.
-void analogWrite(uint8_t pin, uint16_t val)
+void analogWrite(uint8_t pin, __xdata uint16_t val)
 {
 	// We need to make sure the PWM output is enabled for those pins
 	// that support it, as we turn it off when digitally reading or

@@ -179,11 +179,11 @@ int atexit(void (*func)());	// __attribute__((weak));
 void serialEvent(void);		// weak
 extern unsigned char runSerialEvent;
 
-void pinMode(uint8_t pin, uint8_t mode);
-void digitalWrite(uint8_t pin, uint8_t val);
+void pinMode(uint8_t pin, __xdata uint8_t mode);
+void digitalWrite(uint8_t pin, __xdata uint8_t val);
 uint8_t digitalRead(uint8_t pin);
 uint8_t analogRead(uint8_t pin);
-void analogWrite(uint8_t pin, uint16_t val);
+void analogWrite(uint8_t pin, __xdata uint16_t val);
 
 uint32_t millis(void);
 uint32_t micros(void);
@@ -221,7 +221,7 @@ void alternateFunction(uint8_t val);
 
 //FIXME#include "WCharacter.h"
 //FIXME#include "WString.h"
-//!!!!!#include "HardwareSerial.h"
+#include "HardwareSerial.h"
 
 //uint16_t makeWord(uint16_t w);
 //uint16_t makeWord(byte h, byte l);
@@ -260,7 +260,7 @@ inline unsigned int makeWord(unsigned char h, unsigned char l) { return (h << 8)
 
 //USB Serial functions. Don't exist in Arduino AVR core Arduino.h, may be moved later
 bool USBSerial();
-uint8_t USBSerial_print_n(uint8_t * __xdata buf, int len);
+uint8_t USBSerial_print_n(uint8_t * __xdata buf, __xdata int len);
 uint8_t USBSerial_write(char c);
 void USBSerial_flush(void);
 uint8_t USBSerial_available();
@@ -284,5 +284,22 @@ char USBSerial_read();
 #define USBSerial_println_u(P) ( Print_print_u(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_ib(P) ( Print_print_ib(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_ub(P) ( Print_print_ub(USBSerial_write,(P)) + Print_println(USBSerial_write) )
+
+
+#define Serial0_print_s(P) ( Print_print_s(Serial0_write,(P)) )
+#define Serial0_print_sn(P) ( Print_print_sn(Serial0_write,(P)) )
+#define Serial0_print_i(P) ( Print_print_i(Serial0_write,(P)) )
+#define Serial0_print_u(P) ( Print_print_u(Serial0_write,(P)) )
+#define Serial0_print_ib(P) ( Print_print_ib(Serial0_write,(P)) )
+#define Serial0_print_ub(P) ( Print_print_ub(Serial0_write,(P)) )
+
+#define Serial0_println() ( Print_println(Serial0_write) )
+#define Serial0_println_s(P) ( Print_print_s(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_sn(P) ( Print_print_sn(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_i(P) ( Print_print_i(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_u(P) ( Print_print_u(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_ib(P) ( Print_print_ib(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_ub(P) ( Print_print_ub(Serial0_write,(P)) + Print_println(Serial0_write) )
+
 
 #endif

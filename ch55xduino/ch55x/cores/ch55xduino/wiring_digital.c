@@ -2,7 +2,7 @@
 #include "wiring_private.h"
 #include "pins_arduino_include.h"
 
-void pinMode(uint8_t pin, uint8_t mode)	//only P1 & P3 can set mode
+void pinMode(uint8_t pin, __xdata uint8_t mode)	//only P1 & P3 can set mode
 {
 	uint8_t bit = digitalPinToBitMask(pin);
 	uint8_t port = digitalPinToPort(pin);
@@ -103,7 +103,7 @@ uint8_t digitalRead(uint8_t pin)
 	return LOW;
 }
 
-void digitalWrite(uint8_t pin, uint8_t val)
+void digitalWrite(uint8_t pin, __xdata uint8_t val)
 {
 	uint8_t pwm = digitalPinToPWM(pin);
 	uint8_t bit = digitalPinToBitMask(pin);

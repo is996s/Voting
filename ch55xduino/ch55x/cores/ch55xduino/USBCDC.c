@@ -18,7 +18,7 @@ volatile __xdata uint8_t controlLineState = 0;
 __xdata uint8_t usbWritePointer = 0;
 
 typedef void( *pTaskFn)( void );
-pTaskFn tasksArr[1];
+
 void mDelayuS( uint16_t n );
 void mDelaymS( uint16_t n );
 
@@ -52,6 +52,7 @@ void setControlLineStateHandler(){
 
     // We check DTR state to determine if host port is open (bit 0 of lineState).
     if ( ((controlLineState & 0x01) == 0) && (*((__xdata uint32_t *)LineCoding) == 1200) ){ //both linecoding and sdcc are little-endian
+        pTaskFn tasksArr[1];
         USB_CTRL = 0;
         EA = 0;                                                                    //关闭总中断，必加
         tasksArr[0] = (pTaskFn)0x3800;
@@ -102,7 +103,7 @@ uint8_t USBSerial_write(char c){  //3 bytes generic pointer
     return 0;
 }
 
-uint8_t USBSerial_print_n(uint8_t * __xdata buf, int len){  //3 bytes generic pointer, not using USBSerial_write for a bit efficiency
+uint8_t USBSerial_print_n(uint8_t * __xdata buf, __xdata int len){  //3 bytes generic pointer, not using USBSerial_write for a bit efficiency
     uint16_t waitWriteCount;
     if (controlLineState > 0) {
         while (len>0){
