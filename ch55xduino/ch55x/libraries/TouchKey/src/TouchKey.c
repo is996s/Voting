@@ -37,6 +37,8 @@ __xdata uint8_t releaseThreshold;
 
 __xdata uint8_t touchKeyPressed;
 
+#pragma save
+#pragma nooverlay
 void TouchKey_ISR_Handler(void){
     uint8_t index = TKEY_CTRL & 0x07;
     touchRawValue[index-1]=TKEY_DAT;
@@ -48,6 +50,8 @@ void TouchKey_ISR_Handler(void){
     touchISRCounter++;
 
 }
+#pragma restore
+
 
 //TIN0(P1.0), TIN1(P1.1), TIN2(P1.4), TIN3(P1.5), TIN4(P1.6), TIN5(P1.7)
 void TouchKey_begin(uint8_t channelToEnableBitMask){

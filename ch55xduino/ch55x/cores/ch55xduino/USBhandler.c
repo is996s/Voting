@@ -380,6 +380,8 @@ void USB_EP1_IN(){
 }
 
 
+#pragma save
+#pragma nooverlay
 void USBInterrupt(void) {   //inline not really working in multiple files in SDCC
     if(UIF_TRANSFER) {
         // Dispatch to service functions
@@ -473,6 +475,7 @@ void USBInterrupt(void) {   //inline not really working in multiple files in SDC
         }
     }
 }
+#pragma restore
 
 void USBDeviceCfg()
 {

@@ -21,12 +21,19 @@ uint8_t int0CountOld = 0;
 volatile uint8_t int1Count = 0;
 uint8_t int1CountOld = 0;
 
+#pragma save
+#pragma nooverlay
 void int0Callback() {
   int0Count++;
 }
+#pragma restore
+
+#pragma save
+#pragma nooverlay
 void int1Callback() {
   int1Count++;
 }
+#pragma restore
 
 void setup() {
   // put your setup code here, to run once:
