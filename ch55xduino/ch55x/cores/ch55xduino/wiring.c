@@ -1,5 +1,4 @@
 #include "wiring_private.h"
-#include "pins_arduino.h"   //only include once
 
 void mDelaymS( uint16_t n );    //used for delay without timer
 

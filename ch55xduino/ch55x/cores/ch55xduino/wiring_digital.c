@@ -2,6 +2,8 @@
 #include "wiring_private.h"
 #include "pins_arduino_include.h"
 
+#include "pins_arduino.h"   //only include once in core
+
 void pinMode(uint8_t pin, __xdata uint8_t mode)	//only P1 & P3 can set mode
 {
 	uint8_t bit = digitalPinToBitMask(pin);
