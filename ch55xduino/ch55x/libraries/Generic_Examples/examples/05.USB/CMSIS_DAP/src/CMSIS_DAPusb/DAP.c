@@ -284,6 +284,33 @@ static uint8_t DAP_SWJ_Clock(const uint8_t *req, uint8_t *res)
     /**/
     fast_clock = *((uint32_t *)req);
     
+    //Timer0 used for millis, Timer1 used for serial0
+    //we can only use Timer2
+    TR2=0;
+    
+    RCLK = 0;
+    TCLK = 0;
+    C_T2 = 0;
+    
+    //bTMR_CLK may be set by uart0, we keep it as is.
+    T2MOD |= bTMR_CLK | bT2_CLK; //use Fsys for T2
+    
+    CP_RL2 = 0;
+    
+    if (fast_clock<(2*F_CPU/65536L)){
+        RCAP2L=0;
+        RCAP2H=0;
+    }else{
+        uint16_t reloadValueT2 = (uint16_t)(65536L-((F_CPU/2)/fast_clock));
+        RCAP2L = reloadValueT2&0xFF;
+        RCAP2H = (reloadValueT2>>8)&0xFF;
+    }
+    TL2=RCAP2L;
+    TH2=RCAP2H;
+    
+    TF2=0;
+    TR2=1;
+    
     clock_delay = 0;
 
     *res = DAP_OK;
