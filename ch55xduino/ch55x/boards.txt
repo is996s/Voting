@@ -3,6 +3,14 @@
 menu.usb_settings=USB Settings
 menu.upload_method=Upload method
 menu.clock=Clock Source
+
+##############################################################
+#PID VID for board info
+CH55xGenericVCP.name=CH55xduino Serial
+CH55xGenericVCP.hide=
+CH55xGenericVCP.vid.0=0x1209
+CH55xGenericVCP.pid.0=0xC550
+
 ##############################################################
 
 ch552.name=CH552 Board
