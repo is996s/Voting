@@ -34,7 +34,8 @@
 // Please maintain this license information along with authorship
 // and copyright notices in any redistribution of this code
 
-#include <SPIFlash.h>
+#include "SPIFlash.h"
+
 
 //uint8_t SPIFlash::UNIQUEID[8];
 
@@ -49,13 +50,13 @@
 ///            function called. If other commands are used, the flash chip will ignore the commands. 
 
 
-void select() 
+static void select() 
 {
   //SPI_beginTransaction(SPISettings(4000000, MSBFIRST, SPI_MODE0));
   digitalWrite(CS_PIN, LOW);
 }
 
-void unselect() 
+static void unselect() 
 {
   digitalWrite(CS_PIN, HIGH);
   //SPI_endTransaction();   <- inexistent function in ch55xduino
@@ -105,6 +106,7 @@ uint8_t* readUniqueId()
   for (uint8_t i=0;i<8;i++)
     UNIQUEID[i] = SPI_transfer(0);
   unselect();
+    
   return UNIQUEID;
 }
 
@@ -246,33 +248,6 @@ void blockErase64K(uint32_t addr) {
   SPI_transfer(addr >> 8);
   SPI_transfer(addr);
   unselect();
-}
-
-
-/// found() - checks there is a FLASH chip by checking the deviceID repeatedly - should be a consistent value
-uint8_t found() {
-  uint16_t deviceID=0;
-  wakeup(); //if sleep() was previously called, wakeup() is required or it's non responsive
-  for (uint8_t i=0;i<10;i++) {
-    uint16_t idNow = readDeviceId();
-    if (idNow==0 || idNow==0xffff || (i>0 && idNow != deviceID)) {
-      deviceID=0;
-      break;
-    }
-    deviceID=idNow;
-  }
-  if (deviceID==0) { //NO FLASH CHIP FOUND, ABORTING
-    return false;
-  }
-  return true;
-}
-
-///regionIsEmpty() - check a random flashmem byte array is all clear and can be written to (ie. it's all 0xff)
-uint8_t regionIsEmpty(uint32_t startAddress, uint8_t length) {
-  uint8_t flashBuf[length];
-  readBytes(startAddress, flashBuf, length);
-  for (uint8_t i=0;i<length;i++) if (flashBuf[i]!=0xff) return false;
-  return true;
 }
 
 /// Put flash memory chip into power down mode
