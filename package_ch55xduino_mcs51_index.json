@@ -12,6 +12,32 @@
                 {
                     "name": "CH55xDuino MCS51 plain C core (non-C++)",
                     "architecture": "mcs51",
+                    "version": "0.0.6",
+                    "category": "Contributed",
+                    "boards": [
+                        {"name": "CH552 Board"},
+                        {"name": "CH551 Board"}
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "name": "MCS51Tools",
+                            "version": "2020.10.05",
+                            "packager": "CH55xDuino"
+                        },
+                        {
+                            "name": "sdcc",
+                            "version": "build.11630",
+                            "packager": "CH55xDuino"
+                        }
+                    ],
+                    "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.6/ch55xduino-core-0.0.6.tar.bz2",
+                    "archiveFileName": "ch55xduino-core-0.0.6.tar.bz2",
+                    "checksum": "SHA-256:b253f5a90e8a5334370ff4cc2ada9a51529329bce5cef0261af9a53ea94d367a",
+                    "size": "73694"
+                },
+                {
+                    "name": "CH55xDuino MCS51 plain C core (non-C++)",
+                    "architecture": "mcs51",
                     "version": "0.0.5",
                     "category": "Contributed",
                     "boards": [
@@ -114,6 +140,25 @@
                 }
             ],
             "tools" : [
+                {
+                    "name": "MCS51Tools",
+                    "version": "2020.10.05",
+                    "systems": [
+                        {
+                            "host": "x86_64-apple-darwin",
+                            "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.6/ch55xduino-tools_macosx-2020.10.05.tar.bz2",
+                            "archiveFileName": "ch55xduino-tools_macosx-2020.10.05.tar.bz2",
+                            "checksum": "SHA-256:8ee11457383d973f431a690bd9e8479f0610e4b5075b194d7c3879aa0c151bf9",
+                            "size": "16614"
+                        },{
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.6/ch55xduino-tools_mingw32-2020.10.05.tar.bz2",
+                            "archiveFileName": "ch55xduino-tools_mingw32-2020.10.05.tar.bz2",
+                            "checksum": "SHA-256:77f5ed35fbf9a70d808a8b238e42664f91acdf895bdaf5ef2ebfcb74f8af0c8f",
+                            "size": "665454"
+                        }
+                    ]
+                },
                 {
                     "name": "MCS51Tools",
                     "version": "2020.07.07",
