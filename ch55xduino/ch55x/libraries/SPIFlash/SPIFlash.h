@@ -97,6 +97,8 @@
 
 
 static uint8_t UNIQUEID[8];
+
+
 boolean initialize();
 void command(uint8_t cmd, boolean isWrite);
 uint8_t readStatus();
@@ -111,8 +113,6 @@ void blockErase32K(uint32_t address);
 void blockErase64K(uint32_t addr);
 uint16_t readDeviceId();
 uint8_t* readUniqueId();
-uint8_t found();
-uint8_t regionIsEmpty(uint32_t startAddress, uint8_t length);
 
 void sleep();
 void wakeup();
