@@ -1,0 +1,110 @@
+{
+    "packages": [
+        {
+            "name": "CH55xDuino",
+            "maintainer": "Deqing Sun",
+            "websiteURL": "https://github.com/DeqingSun/ch55xduino",
+            "email": "ds@thinkcreate.us ",
+            "help": {
+                "online": "https://github.com/DeqingSun/ch55xduino"
+            },
+            "platforms" : [
+                {
+                    "name": "CH55xDuino MCS51 plain C core (non-C++)",
+                    "architecture": "mcs51",
+                    "version": "0.0.1",
+                    "category": "Contributed",
+                    "boards": [
+                        {"name": "CH552 Board"}
+                    ],
+                    "toolsDependencies": [
+                        {
+                            "name": "MCS51Tools",
+                            "version": "2020.05.31",
+                            "packager": "CH55xDuino"
+                        },
+                        {
+                            "name": "sdcc",
+                            "version": "build.11630",
+                            "packager": "CH55xDuino"
+                        }
+                    ],
+                    "url": "http://192.168.1.150/ch55xduino-core-0.0.1.tar.bz2",
+                    "archiveFileName": "ch55xduino-core-0.0.1.tar.bz2",
+                    "checksum": "SHA-256:5005445edde4cd3173c831b49bc6ab91748f991761ea29b50ccf2a437747b084",
+                    "size": "45954"
+                }
+            ],
+            "tools" : [
+                {
+                    "name": "MCS51Tools",
+                    "version": "2020.05.31",
+                    "systems": [
+                        {
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sduino-tools_linux32-2019.02.05.tar.bz2",
+                            "archiveFileName": "sduino-tools_linux32-2019.02.05.tar.bz2",
+                            "checksum": "SHA-256:86c816ce31fc37d8437ac9a1eb88f0c58444b9abbb9bc16934f0977dec474cc3",
+                            "size": "49540"
+                        },{
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sduino-tools_linux64-2019.02.05.tar.bz2",
+                            "archiveFileName": "sduino-tools_linux64-2019.02.05.tar.bz2",
+                            "checksum": "SHA-256:e417e67551c6d34b6f9a8b8635eb1eb69342fd021b2962e52e495b2dd333d6c7",
+                            "size": "49362"
+                        },{
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://192.168.1.150/ch55xduino-tools_macosx-2020.05.31.tar.bz2",
+                            "archiveFileName": "ch55xduino-tools_macosx-2020.05.31.tar.bz2",
+                            "checksum": "SHA-256:7516a09d14cac399f80ce8b1c098ce24835758d5e924b9bf0b3fb4958add252a",
+                            "size": "10894"
+                        },{
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sduino-tools_mingw32-2019.02.05.tar.bz2",
+                            "archiveFileName": "sduino-tools_mingw32-2019.02.05.tar.bz2",
+                            "checksum": "SHA-256:35d76fb968ac7998ec798502be597d7b234ceddb5c2bcb439d8f24711bd34064",
+                            "size": "418464"
+                        }
+                    ]
+                },
+                {
+                    "name": "sdcc",
+                    "version": "build.11630",
+                    "systems": [
+                        {
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sdcc-stm8-amd64-unknown-linux2.5-20190502-11242.tar.bz2",
+                            "archiveFileName": "sdcc-stm8-amd64-unknown-linux2.5-20190502-11242.tar.bz2",
+                            "checksum": "SHA-256:f69122faf38e72cccb7acc9b4d215e6e74901c053e04295c7ec8f4c29c5bad65",
+                            "size": "2604557"
+                        },{
+                            "host": "x86_64-pc-linux-gnu",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sdcc-stm8-armv6l-unknown-linux-gnueabihf-20190502-11242.tar.bz2",
+                            "archiveFileName": "sdcc-stm8-armv6l-unknown-linux-gnueabihf-20190502-11242.tar.bz2",
+                            "checksum": "SHA-256:e079f964d7b74a8744681dfb53047aecdd0b563dee02c3724dd83a9d4b1e577c",
+                            "size": "2388318"
+                        },{
+                            "host": "i686-pc-linux-gnu",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sdcc-stm8-i386-unknown-linux2.5-20190502-11242.tar.bz2",
+                            "archiveFileName": "sdcc-stm8-i386-unknown-linux2.5-20190502-11242.tar.bz2",
+                            "checksum": "SHA-256:86d3c21aa49199a0ffcf201148c261d5a391d9365b472ab434c3d3acf864de29",
+                            "size": "2649974"
+                        },{
+                            "host": "i686-mingw32",
+                            "url": "https://github.com/tenbaht/sduino/releases/download/v0.5/sdcc-stm8-i586-mingw32msvc-20190502-11242.tar.bz2",
+                            "archiveFileName": "sdcc-stm8-i586-mingw32msvc-20190502-11242.tar.bz2",
+                            "checksum": "SHA-256:1acdd54d62207bced3abb51fc401b0af85ef4711525033764b089fa0db7cb868",
+                            "size": "3034472"
+                        },{
+                            "host": "x86_64-apple-darwin",
+                            "url": "http://192.168.1.150/sdcc-mcs51-x86_64-apple-macosx-20200526-11630.tar.bz2",
+                            "archiveFileName": "sdcc-mcs51-x86_64-apple-macosx-20200526-11630.tar.bz2",
+                            "checksum": "SHA-256:d8bfd0e3c2f86fb84df7eb7dca84645e0894b823884adc04aec0ed85bdda10c0",
+                            "size": "1986083"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
