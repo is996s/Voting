@@ -11,6 +11,7 @@ __xdata uint8_t oldLineState = 0;
 #define USB_SWITCH_PIN 33
 #define POWER_TARGET_PIN 34
 #define USBDP_PULLUP_TARGET_PIN 14
+#define BOOTLOADER_PULLDOWN_TARGET_PIN 16
 
 #define SENSE_TARGET_SWTICH_PERF 17
 #define POWER_PERF_PIN 11
@@ -36,6 +37,8 @@ void setup() {
   pinMode(USBDP_PULLUP_TARGET_PIN, OUTPUT);
   digitalWrite(USBDP_PULLUP_TARGET_PIN, HIGH);
 
+  pinMode(BOOTLOADER_PULLDOWN_TARGET_PIN, INPUT);
+  
   pinMode(SENSE_TARGET_SWTICH_PERF, INPUT_PULLUP);
 
   pinMode(POWER_PERF_PIN, OUTPUT);
@@ -74,10 +77,13 @@ void loop() {
         digitalWrite(USB_SWITCH_PIN, LOW);  //connect target to computer USB
         delay(100);
         digitalWrite(USBDP_PULLUP_TARGET_PIN, LOW); //Connect pull up resistor to target
+        digitalWrite(BOOTLOADER_PULLDOWN_TARGET_PIN, LOW); //if the bootloader require a pin to be pulled low, use this pin  
+        pinMode(BOOTLOADER_PULLDOWN_TARGET_PIN, OUTPUT);
         delay(10);
         digitalWrite(POWER_TARGET_PIN, LOW); //Restore target power
-        delay(10);
+        delay(50);
         digitalWrite(USBDP_PULLUP_TARGET_PIN, HIGH); //Disconnect pull up resistor to target
+        pinMode(BOOTLOADER_PULLDOWN_TARGET_PIN, INPUT);
       }
     }
     oldLineState = currentLineState;
