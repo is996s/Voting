@@ -37,6 +37,12 @@ Now you should find a new entry *CH55x Boards* in the list at
 * If your board is never used with ch55xduino before, you need to make the ch55x chip enter bootloader mode. You need to disconnect USB and unpower ch55x, connect the pull-up resistor on D+ line (generally a 10K resistor between D+ and 5V, controlled by a push-button or adjacent pads). Then you connect USB. and hit *Upload*. Also, a blank new chip will enter the bootloader automatically.
 * If you have used ch55xduino once and your code doesn't crash the USB subsystem, you can simply press *Upload*. Arduino and the firmware will kick the chip into the bootloader automatically.
 
+### Installation without Github access
+
+If you can not access github directly, use this link to a proxy instead.
+
+> https://gh-proxy.deqing.workers.dev/raw.githubusercontent.com/DeqingSun/ch55xduino/playground/mirror/package_ch55xduino_mcs51_proxy_index.json
+
 ### USB and Serial upload
 
 Ch55xduino supports both USB and Serial upload methods. If the USB port of the CH55x chip is connected to a host computer, the USB method is recommended.
