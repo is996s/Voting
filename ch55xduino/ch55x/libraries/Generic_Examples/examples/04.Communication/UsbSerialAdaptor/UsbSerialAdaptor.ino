@@ -21,11 +21,11 @@ void setup() {
 }
 
 void loop() {
-  while (USBSerial_available()) {
+  if (USBSerial_available()) {
     char serialChar = USBSerial_read();
     Serial0_write(serialChar);
   }
-  while (Serial0_available()) {
+  if (Serial0_available()) {
     char serialChar = Serial0_read();
     USBSerial_write(serialChar);
   }
