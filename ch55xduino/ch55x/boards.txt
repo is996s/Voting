@@ -11,9 +11,9 @@ ch552.upload.protocol=ch55x2_3_1
 #CH552 has 16K flash, but 2K is for bootloader, 14K usable
 ch552.upload.maximum_size=14336
 ch552.build.mcu=mcs51
-ch552.menu.clock.24internal=24 MHz (internal)
+ch552.menu.clock.24internal=24 MHz (internal), 5V
 ch552.menu.clock.24internal.build.f_cpu=24000000L
-ch552.menu.clock.16external=16 MHz (internal)
+ch552.menu.clock.16external=16 MHz (internal), 3.3V or 5V
 ch552.menu.clock.16external.build.f_cpu=16000000L
 ch552.build.board=ch55x
 ch552.build.core=ch55xduino
@@ -58,9 +58,9 @@ ch551.upload.protocol=ch55x2_3_1
 #CH551 has 10K flash
 ch551.upload.maximum_size=10240
 ch551.build.mcu=mcs51
-ch551.menu.clock.24internal=24 MHz (internal)
+ch551.menu.clock.24internal=24 MHz (internal), 5V
 ch551.menu.clock.24internal.build.f_cpu=24000000L
-ch551.menu.clock.16external=16 MHz (internal)
+ch551.menu.clock.16external=16 MHz (internal), 3.3V or 5V
 ch551.menu.clock.16external.build.f_cpu=16000000L
 ch551.build.board=ch55x
 ch551.build.core=ch55xduino

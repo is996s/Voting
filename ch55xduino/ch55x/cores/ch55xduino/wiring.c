@@ -11,26 +11,18 @@ extern __idata volatile uint8_t timer0_overflow_count_5th_byte;
 
 uint32_t micros(){
     /*uint32_t m;
-    uint8_t t;
-    uint8_t interruptOn = EA;
-    EA = 0;
-    
-    m = timer0_overflow_count;
-    t = TL0;
-    
-    if ((TF0) && (t < 255)){
-        m++;
-    }
-    
-    if (interruptOn) EA = 1;
-    //1m = 250t 1t=0.5us (m*250+t-6)/2
-    
-    t=(t>>1)-3;
-    m=m*125;
-    
-    return ( m+t );*/
-  
-    //assembly has better support for multiplication
+     uint8_t t;
+     uint8_t interruptOn = EA;
+     EA = 0;
+     
+     m = timer0_overflow_count;
+     t = TL0;
+     
+     if ((TF0) && (t < 255)){
+     m++;
+     }
+     
+     if (interruptOn) EA = 1;*/
     
     __asm__ (";uint8_t interruptOn = EA; //to c            \n"
              ";clr and mov won't affect c                  \n"
@@ -64,7 +56,146 @@ uint32_t micros(){
              "    cjne r2,#0,incTimer0_overf_cntCopyOver$  \n"
              "    inc r3                                   \n"
              "incTimer0_overf_cntCopyOver$:                \n"
+            );
+    
+#if F_CPU == 16000000
+    //1m = 250t 1t=0.75us (m*250+t-6)*3/2/2
+    //m in r0~r3
+    //t in r4
+    //t=((3*t)>>1)-9);
+    //m=(m*375)=m<<8+m*119;
+    //return (m+t)>>1
+    
+    
+    __asm__ (
+             ";1m = 250t 1t=0.5us (m*250+t-6)*3/2/2  t is 6~255\n"
+             ";we need to return (m<<8+m*119+((3*t)>>1)-9))>>1 \n"
              
+             ";m=m*119;                                    \n"
+             "    mov a, r0                                \n"
+             "    mov r6, a                                \n"
+             "    mov a, r1                                \n"
+             "    mov r7, a                                \n"
+             "    push ar3                                 \n"
+             "    push ar2                                 \n"
+             
+             "    mov b, #119                              \n"
+             "    mov a, r0                                \n"
+             "    mul ab                                   \n"
+             "    mov r0, a                                \n"
+             "    mov r5, b                                \n"
+             
+             "    mov b, #119                              \n"
+             "    mov a, r1                                \n"
+             "    mul ab                                   \n"
+             "    add a, r5                                \n"
+             "    mov r1, a                                \n"
+             "    clr a                                    \n"
+             "    addc a, b                                \n"
+             "    mov r5, a                                \n"
+             
+             "    mov b, #119                              \n"
+             "    mov a, r2                                \n"
+             "    mul ab                                   \n"
+             "    add a, r5                                \n"
+             "    mov r2, a                                \n"
+             "    clr a                                    \n"
+             "    addc a, b                                \n"
+             "    mov r5, a                                \n"
+             
+             "    mov b, #119                              \n"
+             "    mov a, r3                                \n"
+             "    mul ab                                   \n"
+             "    add a, r5                                \n"
+             "    mov r3, a                                \n"
+             "    clr a                                    \n"
+             "    addc a, b                                \n"
+             "    mov r5, a                                \n"
+             
+             ";m=m+m<<8;                                   \n"
+             
+             "    mov a, r6                                \n"
+             "    add a, r1                                \n"
+             "    mov r1, a                                \n"
+             "    mov a, r7                                \n"
+             "    addc a, r2                                \n"
+             "    mov r2, a                                \n"
+             "    pop a                                    \n"
+             "    addc a, r3                                \n"
+             "    mov r3, a                                \n"
+             "    pop a                                    \n"
+             "    addc a, r5                                \n"
+             "    mov r5, a                                \n"
+             
+             ";t=((3*t)>>1));                             \n"
+             
+             "    mov b, #3                                \n"
+             "    mov a, r4                                \n"
+             "    mul ab                                   \n"
+             "    mov r4, a                                \n"
+             "    mov a, b                                 \n"
+             "    clr c                                    \n"
+             "    rrc a                                    \n"
+             "    mov r6, a                                \n"
+             "    mov a, r4                                \n"
+             "    rrc a                                    \n"
+             "    mov r4, a                                \n"
+             "    ;sub r4:r6 by 9                          \n"
+            // TODO: R4 may overflow, skip-9 for now (4.5us offset may not be an issue?)
+             
+             ";get m+t                                     \n"
+             "    mov r7, #0                               \n"
+             "    mov a, r4                                \n"
+             "    add a, r0                                \n"
+             "    mov r0, a                                \n"
+             "    mov a, r6                                \n"
+             "    addc a, r1                               \n"
+             "    mov r1, a                                \n"
+             "    mov a, r7                                \n"
+             "    addc a, r2                               \n"
+             "    mov r2, a                                \n"
+             "    mov a, r7                                \n"
+             "    addc a, r3                               \n"
+             "    mov r3, a                                \n"
+             "    mov a, r7                                \n"
+             "    addc a, r5                               \n"
+             "    mov r5, a                                \n"
+             
+             ";return m+t                                  \n"
+             "    clr c                                    \n"
+             "    mov a, r5                                \n"
+             "    rrc a                                    \n"
+             "    mov r5, a                                \n"
+             "    mov a, r3                                \n"
+             "    rrc a                                    \n"
+             "    mov r3, a                                \n"
+             "    mov a, r2                                \n"
+             "    rrc a                                    \n"
+             "    mov b, a                                 \n"
+             "    mov a, r1                                \n"
+             "    rrc a                                    \n"
+             "    mov dph, a                               \n"
+             "    mov a, r0                                \n"
+             "    rrc a                                    \n"
+             "    mov dpl, a                               \n"
+             "    mov a, r3                                \n"
+             
+             );
+    //’dpl’ (LSB),’dph’,’b’ & ’acc’
+#else
+    //24M CLK
+    
+     /*1m = 250t 1t=0.5us (m*250+t-6)/2
+     
+     t=(t>>1)-3;
+     m=m*125;
+     
+     return ( m+t );*/
+    
+    //assembly has better support for multiplication
+    
+
+__asm__ (
              ";1m = 250t 1t=0.5us (m*250+t-6)/2  t is 6~255\n"
              ";we need to return m*125+t-3                 \n"
              ";t=(t>>1)-3;                                 \n"
@@ -72,9 +203,10 @@ uint32_t micros(){
              "    clr c                                    \n"
              "    rrc a                                    \n"
              "    mov r4,a                                 \n"
-             "    dec r4                                   \n"
-             "    dec r4                                   \n"
-             "    dec r4                                   \n"
+             //"    dec r4                                   \n"
+             //"    dec r4                                   \n"
+             //"    dec r4                                   \n"
+         // TODO: R4 may overflow, disable for now (3us offset may not be an issue?)
              
              ";m=m*125;                                    \n"
              "    mov b, #125                              \n"
@@ -106,7 +238,7 @@ uint32_t micros(){
              "    mul ab                                   \n"
              "    add a, r5                                \n"
              "    mov r3, a                                \n"
-         
+             
              ";return m+t                                  \n"
              "    mov r5, #0                               \n"
              "    mov a, r4                                \n"
@@ -120,9 +252,9 @@ uint32_t micros(){
              "    mov b, a                                 \n"
              "    mov a, r3                                \n"
              "    addc a, r5                               \n"
-
+             
              );
-    
+#endif
     //return values: ’dpl’ 1B, ’dpl’ LSB & ’dph’ 2B,
     //’dpl’, ’dph’ and ’b’ 3B, ’dpl’,’dph’,’b’ & ’acc’ 4B
     
@@ -150,7 +282,55 @@ uint32_t millis()
              "    mov r4, (_timer0_overflow_count)+4       \n"
              ";if (interruptOn) EA = 1;                    \n"
              "    mov _EA,c                                \n"
-             ";return timer0_overflow_count>>3             \n"
+             );
+
+#if F_CPU == 16000000
+    __asm__ (";return (timer0_overflow_count*48)>>8        \n"
+             
+             "    mov b, #48                               \n"
+             "    mov a, r0                                \n"
+             "    mul ab                                   \n"
+             "    mov r0, b                                \n"
+             ";lowest 8 bit not used (a), r0 free to use   \n"
+             "    mov b, #48                               \n"
+             "    mov a, r1                                \n"
+             "    mul ab                                   \n"
+             "    add a, r0                                \n"
+             "    mov r5, psw   ;keep c                    \n"
+             "    mov dpl, a                               \n"
+             "    mov r0, b                                \n"
+             
+             "    mov b, #48                               \n"
+             "    mov a, r2                                \n"
+             "    mul ab                                   \n"
+             "    mov psw, r5   ;restore c                 \n"
+             "    addc a, r0                               \n"
+             "    mov r5, psw   ;keep c                    \n"
+             "    mov dph, a                               \n"
+             "    mov r0, b                                \n"
+             
+             "    mov b, #48                               \n"
+             "    mov a, r3                                \n"
+             "    mul ab                                   \n"
+             "    mov psw, r5   ;restore c                 \n"
+             "    addc a, r0                               \n"
+             "    mov r5, psw   ;keep c                    \n"
+             "    mov r1, a                                \n"
+             "    mov r0, b                                \n"
+             
+             "    mov b, #48                               \n"
+             "    mov a, r4                                \n"
+             "    mul ab                                   \n"
+             "    mov psw, r5   ;restore c                 \n"
+             "    addc a, r0                               \n"
+             
+             ";calculation finished, a already in place    \n"
+             "    mov b, r1                                \n"
+             );
+             
+#else
+             //24M CLK
+    __asm__ (";return timer0_overflow_count>>3             \n"
              ";Or: return (timer0_overflow_count<<5)>>8    \n"
              ";Or: return (timer0_overflow_count*32)>>8    \n"
              "    mov b, #32                               \n"
@@ -191,6 +371,7 @@ uint32_t millis()
              ";calculation finished, a already in place    \n"
              "    mov b, r1                                \n"
              );
+#endif
 }
 
 void delay(uint32_t ms)
