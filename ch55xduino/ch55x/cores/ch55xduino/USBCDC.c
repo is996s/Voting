@@ -19,8 +19,6 @@ volatile __xdata uint8_t controlLineState = 0;
 
 __xdata uint8_t usbWritePointer = 0;
 
-typedef void( *pTaskFn)( void );
-
 void mDelayuS( uint16_t n );
 void mDelaymS( uint16_t n );
 
@@ -54,12 +52,10 @@ void setControlLineStateHandler(){
 
     // We check DTR state to determine if host port is open (bit 0 of lineState).
     if ( ((controlLineState & 0x01) == 0) && (*((__xdata uint32_t *)LineCoding) == 1200) ){ //both linecoding and sdcc are little-endian
-        pTaskFn tasksArr[1];
         USB_CTRL = 0;
         EA = 0;                                                                    //Disabling all interrupts is required.
-        tasksArr[0] = (pTaskFn)0x3800;
         mDelaymS( 100 );     
-        (tasksArr[0])( );                                                          //Jump to bootloader code
+        __asm__ ("lcall #0x3800");                                                 //Jump to bootloader code
         while(1);
     }
     
@@ -67,10 +63,10 @@ void setControlLineStateHandler(){
 
 bool USBSerial(){
     bool result = false;
-	if (controlLineState > 0) 
-		result = true;
-	//mDelaymS(10); not doing it for now
-	return result;
+    if (controlLineState > 0)
+        result = true;
+    //mDelaymS(10); not doing it for now
+    return result;
 }
 
 

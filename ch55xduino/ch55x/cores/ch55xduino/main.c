@@ -73,25 +73,25 @@ void TOUCHKEY_ISR(void) __interrupt (INT_NO_TKEY)
 }
 
 
-int main(void)
+void main(void)
 {
-	init();
-
-	//!!!initVariant();
-
-	setup();
+    init();
     
-	for (;;) {
-		loop();
-		if (1) {
+    //!!!initVariant();
+    
+    setup();
+    
+    for (;;) {
+        loop();
+        if (1) {
 #ifndef USER_USB_RAM
             USBSerial_flush();
 #endif
             //serialEvent();
         }
-	}
-        
-//	return 0;
+    }
+    
+    //    return 0;
 }
 
 unsigned char _sdcc_external_startup (void) __nonbanked
