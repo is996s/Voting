@@ -3,9 +3,11 @@
 
 void mDelaymS( uint16_t n );    //used for delay without timer
 
+#ifndef USER_USB_RAM
 void USBDeviceCfg();
 void USBDeviceIntCfg();
 void USBDeviceEndPointCfg();
+#endif
 
 extern __idata volatile uint32_t timer0_millis;
 extern __idata volatile uint32_t timer0_overflow_count;
@@ -87,7 +89,8 @@ void init()
     SAFE_MOD = 0x00;
     
     mDelaymS(5); //needed to stablize internal RC
-    
+
+#ifndef USER_USB_RAM    
 	//init USB
     USBDeviceCfg();
     USBDeviceEndPointCfg();                                               //????
@@ -95,6 +98,7 @@ void init()
     UEP0_T_LEN = 0;
     UEP1_T_LEN = 0;                                                       //????????????
     UEP2_T_LEN = 0;                                                       //????????????
+#endif
 	
 	//init PWM
 	PWM_CK_SE = 93;		//DIV by 94 for 1K freq on 24M clk

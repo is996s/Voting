@@ -1,20 +1,20 @@
-#ifndef USER_USB_RAM
-
 #include <stdint.h>
 #include <stdbool.h>
 #include "include/ch554.h"
 #include "include/ch554_usb.h"
+#include "USBconstant.h"
+#include "USBhandler.h"
 
 extern __xdata __at (EP0_ADDR) uint8_t  Ep0Buffer[];
 extern __xdata __at (EP2_ADDR) uint8_t  Ep2Buffer[];
 
 #define LINE_CODEING_SIZE 7
-__xdata uint8_t LineCoding[LINE_CODEING_SIZE]={0x00,0xe1,0x00,0x00,0x00,0x00,0x08};   //初始化波特率为57600，1停止位，无校验，8数据位。
+__xdata uint8_t LineCoding[LINE_CODEING_SIZE]={0x00,0xe1,0x00,0x00,0x00,0x00,0x08};   //Initialize for baudrate 57600, 1 stopbit, No parity, eight data bits
 
-volatile __xdata uint8_t USBByteCountEP2 = 0;      //代表USB端点接收到的数据
-volatile __xdata uint8_t USBBufOutPointEP2 = 0;    //取数据指针
+volatile __xdata uint8_t USBByteCountEP2 = 0;      //Bytes of received data on USB endpoint
+volatile __xdata uint8_t USBBufOutPointEP2 = 0;    //Data pointer for fetching
 
-volatile __xdata uint8_t UpPoint2_Busy  = 0;   //上传端点是否忙标志
+volatile __xdata uint8_t UpPoint2_Busy  = 0;   //Flag of whether upload pointer is busy
 volatile __xdata uint8_t controlLineState = 0;
 
 __xdata uint8_t usbWritePointer = 0;
@@ -24,9 +24,18 @@ typedef void( *pTaskFn)( void );
 void mDelayuS( uint16_t n );
 void mDelaymS( uint16_t n );
 
+void USBInit(){
+    USBDeviceCfg();                                                       //Device mode configuration
+    USBDeviceEndPointCfg();                                               //Endpoint configuration   
+    USBDeviceIntCfg();                                                    //Interrupt configuration    
+    UEP0_T_LEN = 0;
+    UEP1_T_LEN = 0;                                                       //Pre-use send length must be cleared	  
+    UEP2_T_LEN = 0;                                                          
+}
+
 void resetCDCParameters(){
 
-    USBByteCountEP2 = 0;       //USB端点收到的长度
+    USBByteCountEP2 = 0;       //Bytes of received data on USB endpoint
     UpPoint2_Busy = 0;
 }
 
@@ -56,10 +65,10 @@ void setControlLineStateHandler(){
     if ( ((controlLineState & 0x01) == 0) && (*((__xdata uint32_t *)LineCoding) == 1200) ){ //both linecoding and sdcc are little-endian
         pTaskFn tasksArr[1];
         USB_CTRL = 0;
-        EA = 0;                                                                    //关闭总中断，必加
+        EA = 0;                                                                    //Disabling all interrupts is required.
         tasksArr[0] = (pTaskFn)0x3800;
         mDelaymS( 100 );     
-        (tasksArr[0])( );                                                          //跳至BOOT升级程序,使用ISP工具升级
+        (tasksArr[0])( );                                                          //Jump to bootloader code
         while(1);
     }
     
@@ -76,8 +85,8 @@ bool USBSerial(){
 
 void USBSerial_flush(void){
     if (!UpPoint2_Busy && usbWritePointer>0){
-        UEP2_T_LEN = usbWritePointer;                                                    //预使用发送长度一定要清空
-        UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;            //应答ACK
+        UEP2_T_LEN = usbWritePointer;                                                   
+        UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;            //Respond ACK
         UpPoint2_Busy = 1;
         usbWritePointer = 0;
     }
@@ -146,18 +155,17 @@ char USBSerial_read(){
 }
 
 void USB_EP2_IN(){
-    UEP2_T_LEN = 0;                                                    //预使用发送长度一定要清空
-    UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;           //默认应答NAK
-    UpPoint2_Busy = 0;                                                  //清除忙标志
+    UEP2_T_LEN = 0;                                                    // No data to send anymore
+    UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;           //Respond NAK by default
+    UpPoint2_Busy = 0;                                                  //Clear busy flag
 }
 
 void USB_EP2_OUT(){
-    if ( U_TOG_OK )                                                     // 不同步的数据包将丢弃
+    if ( U_TOG_OK )                                                     // Discard unsynchronized packets
     {
         USBByteCountEP2 = USB_RX_LEN;
-        USBBufOutPointEP2 = 0;                                             //取数据指针复位
-        if (USBByteCountEP2)    UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_NAK;       //收到一包数据就NAK，主函数处理完，由主函数修改响应方式
+        USBBufOutPointEP2 = 0;                                             //Reset Data pointer for fetching
+        if (USBByteCountEP2)    UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_R_RES | UEP_R_RES_NAK;       //Respond NAK after a packet. Let main code change response after handling.
     }
 }
 
-#endif

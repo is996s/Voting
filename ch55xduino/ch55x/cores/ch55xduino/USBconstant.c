@@ -1,3 +1,5 @@
+#ifndef USER_USB_RAM
+
 #include "USBconstant.h"
 
 
@@ -65,5 +67,4 @@ __code uint8_t Manuf_Des[]={
 };
 __code uint16_t Manuf_DesLen = sizeof(Manuf_Des);
 
-
-
+#endif

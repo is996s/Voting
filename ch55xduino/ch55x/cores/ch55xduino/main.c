@@ -84,7 +84,9 @@ int main(void)
 	for (;;) {
 		loop();
 		if (1) {
+#ifndef USER_USB_RAM
             USBSerial_flush();
+#endif
             //serialEvent();
         }
 	}

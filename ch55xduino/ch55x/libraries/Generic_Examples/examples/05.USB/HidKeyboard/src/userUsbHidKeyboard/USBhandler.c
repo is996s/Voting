@@ -1,20 +1,18 @@
-#ifndef USER_USB_RAM
-
 #include "USBhandler.h"
 
 #include "USBconstant.h"
 
-//CDC functions:
-void resetCDCParameters();
-void setLineCodingHandler();
-uint16_t getLineCodingHandler();
-void setControlLineStateHandler();
+//Keyboard functions:
+
 void USB_EP2_IN();
 void USB_EP2_OUT();
 
 __xdata __at (EP0_ADDR) uint8_t  Ep0Buffer[8];     
-__xdata __at (EP1_ADDR) uint8_t  Ep1Buffer[8];       //on page 47 of data sheet, the receive buffer need to be min(possible packet size+2,64)
-__xdata __at (EP2_ADDR) uint8_t  Ep2Buffer[128];     //IN and OUT buffer, must be even address
+__xdata __at (EP1_ADDR) uint8_t  Ep1Buffer[128];       //on page 47 of data sheet, the receive buffer need to be min(possible packet size+2,64), IN and OUT buffer, must be even address
+
+#if (EP1_ADDR+128) > USER_USB_RAM
+#error "This example needs more USB ram. Increase this setting in menu."
+#endif
 
 uint16_t SetupLen;
 uint8_t SetupReq,UsbConfig;
@@ -30,10 +28,10 @@ void USB_EP0_SETUP(){
     if(len == (sizeof(USB_SETUP_REQ)))
     {
         SetupLen = ((uint16_t)UsbSetupBuf->wLengthH<<8) | (UsbSetupBuf->wLengthL);
-        len = 0;                                                      // 默认为成功并且上传0长度
+        len = 0;                                                      // Default is success and upload 0 length
         SetupReq = UsbSetupBuf->bRequest;
         usbMsgFlags = 0;
-        if ( ( UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK ) != USB_REQ_TYP_STANDARD )//非标准请求
+        if ( ( UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK ) != USB_REQ_TYP_STANDARD )//Not standard request
         {
             
             //here is the commnunication starts, refer to usbFunctionSetup of USBtiny
@@ -54,41 +52,32 @@ void USB_EP0_SETUP(){
                 case USB_REQ_TYP_CLASS:
                 {
                     switch( SetupReq )
-                    {
-                        case GET_LINE_CODING:   //0x21  currently configured
-                            len = getLineCodingHandler();
-                            break;
-                        case SET_CONTROL_LINE_STATE:  //0x22  generates RS-232/V.24 style control signals
-                            setControlLineStateHandler();
-                            break;
-                        case SET_LINE_CODING:      //0x20  Configure
-                            break;
-                            
+                    {       
                         default:
-                            len = 0xFF;                                                                        /*命令不支持*/
+                            len = 0xFF;                                                                        //command not supported
                             break;
                     }
                     break;
                 }
                 default:
-                    len = 0xFF;                                                                        /*命令不支持*/
+                    len = 0xFF;                                                                        //command not supported
                     break;
             }
 
         }
-        else                                                             //标准请求
+        else                                                             //Standard request
         {
-            switch(SetupReq)                                             //请求码
+            switch(SetupReq)                                             //Request ccfType
             {
                 case USB_GET_DESCRIPTOR:
                     switch(UsbSetupBuf->wValueH)
                 {
-                    case 1:                                                       //设备描述符
-                        pDescr = DevDesc;                                         //把设备描述符送到要发送的缓冲区
+                    case 1:                                                       //Device Descriptor
+                        pDescr = DevDesc;                                         //Put Device Descriptor into outgoing buffer
                         len = DevDescLen;
                         break;
-                    case 2:                                                        //配置描述符
-                        pDescr = CfgDesc;                                          //把设备描述符送到要发送的缓冲区
+                    case 2:                                                        //Configure Descriptor
+                        pDescr = CfgDesc;                                       
                         len = CfgDescLen;
                         break;
                     case 3:
@@ -112,37 +101,40 @@ void USB_EP0_SETUP(){
                             pDescr = SerDes;
                             len = SerDesLen;
                         }
-                        else if(UsbSetupBuf->wValueL == 4)
+                        else
                         {
-                            pDescr = CDC_Des;
-                            len = CDC_DesLen;
+                            len = 0xff;  
+                        }
+                        break;
+                     case 0x22:
+                        if(UsbSetupBuf->wValueL == 0){
+                            pDescr = ReportDesc;
+                            len = ReportDescLen;
                         }
                         else
                         {
-                            pDescr = SerDes;
-                            len = SerDesLen;
+                            len = 0xff;  
                         }
                         break;
                     default:
-                        len = 0xff;                                                //不支持的命令或者出错
+                        len = 0xff;                                                // Unsupported descriptors or error
                         break;
                 }
                     if (len != 0xff){
                         if ( SetupLen > len )
                         {
-                            SetupLen = len;    //限制总长度
+                            SetupLen = len;    // Limit length
                         }
-                        len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;                            //本次传输长度
+                        len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;                            //transmit length for this packet
                         for (uint8_t i=0;i<len;i++){
                             Ep0Buffer[i] = pDescr[i];
                         }
-                        //memcpy(Ep0Buffer,pDescr,len);                                  //加载上传数据
                         SetupLen -= len;
                         pDescr += len;
                     }
                     break;
                 case USB_SET_ADDRESS:
-                    SetupLen = UsbSetupBuf->wValueL;                              //暂存USB设备地址
+                    SetupLen = UsbSetupBuf->wValueL;                              // Save the assigned address
                     break;
                 case USB_GET_CONFIGURATION:
                     Ep0Buffer[0] = UsbConfig;
@@ -157,30 +149,27 @@ void USB_EP0_SETUP(){
                 case USB_GET_INTERFACE:
                     break;
                 case USB_SET_INTERFACE:
-                    if (UsbSetupBuf->wIndexL == 3){ //setting interface 3 (webusb)
-                        //serial.js do selectAlternateInterface first
-                    }
                     break;
                 case USB_CLEAR_FEATURE:                                            //Clear Feature
-                    if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_DEVICE )                  /* 清除设备 */
+                    if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_DEVICE )                  // Clear the device featuee.
                     {
                         if( ( ( ( uint16_t )UsbSetupBuf->wValueH << 8 ) | UsbSetupBuf->wValueL ) == 0x01 )
                         {
                             if( CfgDesc[ 7 ] & 0x20 )
                             {
-                                /* 唤醒 */
+                                // wake up
                             }
                             else
                             {
-                                len = 0xFF;                                        /* 操作失败 */
+                                len = 0xFF;                                        //Failed
                             }
                         }
                         else
                         {
-                            len = 0xFF;                                            /* 操作失败 */
+                            len = 0xFF;                                            //Failed
                         }
                     }
-                    else if ( ( UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK ) == USB_REQ_RECIP_ENDP )// 端点
+                    else if ( ( UsbSetupBuf->bRequestType & USB_REQ_RECIP_MASK ) == USB_REQ_RECIP_ENDP )// endpoint
                     {
                         switch( UsbSetupBuf->wIndexL )
                         {
@@ -209,87 +198,85 @@ void USB_EP0_SETUP(){
                                 UEP1_CTRL = UEP1_CTRL & ~ ( bUEP_R_TOG | MASK_UEP_R_RES ) | UEP_R_RES_ACK;
                                 break;
                             default:
-                                len = 0xFF;                                         // 不支持的端点
+                                len = 0xFF;                                         // Unsupported endpoint
                                 break;
                         }
                     }
                     else
                     {
-                        len = 0xFF;                                                // 不是端点不支持
+                        len = 0xFF;                                                // Unsupported for non-endpoint
                     }
                     break;
-                case USB_SET_FEATURE:                                          /* Set Feature */
-                    if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_DEVICE )                  /* 设置设备 */
+                case USB_SET_FEATURE:                                          // Set Feature
+                    if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_DEVICE )                  // Set  the device featuee.
                     {
                         if( ( ( ( uint16_t )UsbSetupBuf->wValueH << 8 ) | UsbSetupBuf->wValueL ) == 0x01 )
                         {
                             if( CfgDesc[ 7 ] & 0x20 )
                             {
-                                /* 休眠 */
-#ifdef DE_PRINTF
-                                sendStrDebugCodeSpace( "suspend\r\n" );                                                             //睡眠状态
-#endif
-                                //while ( XBUS_AUX & bUART0_TX );    //等待发送完成
+                                // suspend
+
+                                //while ( XBUS_AUX & bUART0_TX );    //Wait till uart0 sending complete
                                 //SAFE_MOD = 0x55;
                                 //SAFE_MOD = 0xAA;
-                                //WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO | bWAK_RXD1_LO;                      //USB或者RXD0/1有信号时可被唤醒
-                                //PCON |= PD;                                                                 //睡眠
+                                //WAKE_CTRL = bWAK_BY_USB | bWAK_RXD0_LO | bWAK_RXD1_LO;                      //wake up by USB or RXD0/1 signal
+                                //PCON |= PD;                                                                 //sleep
                                 //SAFE_MOD = 0x55;
                                 //SAFE_MOD = 0xAA;
                                 //WAKE_CTRL = 0x00;
                             }
                             else
                             {
-                                len = 0xFF;                                        /* 操作失败 */
+                                len = 0xFF;                                        // Failed
                             }
                         }
                         else
                         {
-                            len = 0xFF;                                            /* 操作失败 */
+                            len = 0xFF;                                            // Failed
                         }
                     }
-                    else if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_ENDP )             /* 设置端点 */
+                    else if( ( UsbSetupBuf->bRequestType & 0x1F ) == USB_REQ_RECIP_ENDP )             //endpoint
                     {
                         if( ( ( ( uint16_t )UsbSetupBuf->wValueH << 8 ) | UsbSetupBuf->wValueL ) == 0x00 )
                         {
                             switch( ( ( uint16_t )UsbSetupBuf->wIndexH << 8 ) | UsbSetupBuf->wIndexL )
                             {
                                 case 0x84:
-                                    UEP4_CTRL = UEP4_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* 设置端点4 IN STALL */
+                                    UEP4_CTRL = UEP4_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;// Set endpoint4 IN STALL 
                                     break;
                                 case 0x04:
-                                    UEP4_CTRL = UEP4_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* 设置端点4 OUT Stall */
+                                    UEP4_CTRL = UEP4_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;// Set endpoint4 OUT Stall 
                                     break;
                                 case 0x83:
-                                    UEP3_CTRL = UEP3_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* 设置端点3 IN STALL */
+                                    UEP3_CTRL = UEP3_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;// Set endpoint3 IN STALL 
                                     break;
                                 case 0x03:
-                                    UEP3_CTRL = UEP3_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* 设置端点3 OUT Stall */
+                                    UEP3_CTRL = UEP3_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;// Set endpoint3 OUT Stall 
                                     break;
                                 case 0x82:
-                                    UEP2_CTRL = UEP2_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* 设置端点2 IN STALL */
+                                    UEP2_CTRL = UEP2_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;// Set endpoint2 IN STALL 
                                     break;
                                 case 0x02:
-                                    UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* 设置端点2 OUT Stall */
+                                    UEP2_CTRL = UEP2_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;// Set endpoint2 OUT Stall 
                                     break;
                                 case 0x81:
-                                    UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;/* 设置端点1 IN STALL */
+                                    UEP1_CTRL = UEP1_CTRL & (~bUEP_T_TOG) | UEP_T_RES_STALL;// Set endpoint1 IN STALL 
                                     break;
                                 case 0x01:
-                                    UEP1_CTRL = UEP1_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;/* 设置端点1 OUT Stall */
+                                    UEP1_CTRL = UEP1_CTRL & (~bUEP_R_TOG) | UEP_R_RES_STALL;// Set endpoint1 OUT Stall 
                                 default:
-                                    len = 0xFF;                                    /* 操作失败 */
+                                    len = 0xFF;                                    // Failed
                                     break;
                             }
                         }
                         else
                         {
-                            len = 0xFF;                                      /* 操作失败 */
+                            len = 0xFF;                                      // Failed
                         }
                     }
                     else
                     {
-                        len = 0xFF;                                          /* 操作失败 */
+                        len = 0xFF;                                          // Failed
                     }
                     break;
                 case USB_GET_STATUS:
@@ -305,29 +292,29 @@ void USB_EP0_SETUP(){
                     }
                     break;
                 default:
-                    len = 0xff;                                                    //操作失败
+                    len = 0xff;                                                    // Failed
                     break;
             }
         }
     }
     else
     {
-        len = 0xff;                                                         //包长度错误
+        len = 0xff;                                                         //Wrong packet length
     }
     if(len == 0xff)
     {
         SetupReq = 0xFF;
         UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_STALL | UEP_T_RES_STALL;//STALL
     }
-    else if(len <= DEFAULT_ENDP0_SIZE)                                                       //上传数据或者状态阶段返回0长度包
+    else if(len <= DEFAULT_ENDP0_SIZE)                                                       // Tx data to host or send 0-length packet
     {
         UEP0_T_LEN = len;
-        UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;//默认数据包是DATA1，返回应答ACK
+        UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;//Expect DATA1, Answer ACK
     }
     else
     {
-        UEP0_T_LEN = 0;  //虽然尚未到状态阶段，但是提前预置上传0长度数据包以防主机提前进入状态阶段
-        UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;//默认数据包是DATA1,返回应答ACK
+        UEP0_T_LEN = 0;  // Tx data to host or send 0-length packet
+        UEP0_CTRL = bUEP_R_TOG | bUEP_T_TOG | UEP_R_RES_ACK | UEP_T_RES_ACK;//Expect DATA1, Answer ACK
     }
 }
 
@@ -336,15 +323,15 @@ void USB_EP0_IN(){
     {
         case USB_GET_DESCRIPTOR:
         {
-            uint8_t len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;                                 //本次传输长度
+            uint8_t len = SetupLen >= DEFAULT_ENDP0_SIZE ? DEFAULT_ENDP0_SIZE : SetupLen;                                 //send length
             for (uint8_t i=0;i<len;i++){
                 Ep0Buffer[i] = pDescr[i];
             }
-            //memcpy( Ep0Buffer, pDescr, len );                                   //加载上传数据
+            //memcpy( Ep0Buffer, pDescr, len );                                  
             SetupLen -= len;
             pDescr += len;
             UEP0_T_LEN = len;
-            UEP0_CTRL ^= bUEP_T_TOG;                    //同步标志位翻转
+            UEP0_CTRL ^= bUEP_T_TOG;                    //Switch between DATA0 and DATA1
         }
             break;
         case USB_SET_ADDRESS:
@@ -352,34 +339,19 @@ void USB_EP0_IN(){
             UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
             break;
         default:
-            UEP0_T_LEN = 0;                                                      //状态阶段完成中断或者是强制上传0长度数据包结束控制传输
+            UEP0_T_LEN = 0;                                                      // End of transaction
             UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
             break;
     }
 }
 
 void USB_EP0_OUT(){
-    if(SetupReq ==SET_LINE_CODING)  //设置串口属性
-    {
-        if( U_TOG_OK )
-        {
-            setLineCodingHandler();
-            UEP0_T_LEN = 0;
-            UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_ACK;  // 准备上传0包
-        }
-    }
-    else
     {
         UEP0_T_LEN = 0;
-        UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_NAK;  //状态阶段，对IN响应NAK
+        UEP0_CTRL |= UEP_R_RES_ACK | UEP_T_RES_NAK;  //Respond Nak
     }
 }
 
-
-void USB_EP1_IN(){
-    UEP1_T_LEN = 0;
-    UEP1_CTRL = UEP1_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;           //默认应答NAK
-}
 
 
 #pragma save
@@ -445,17 +417,12 @@ void USBInterrupt(void) {   //inline not really working in multiple files in SDC
     // Device mode USB bus reset
     if(UIF_BUS_RST) {
         UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;
-        UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;
-        UEP2_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;
-        UEP3_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;
-        UEP4_CTRL = UEP_T_RES_NAK | UEP_R_RES_ACK;  //bUEP_AUTO_TOG only work for endpoint 1,2,3
+        UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;
         
         USB_DEV_AD = 0x00;
         UIF_SUSPEND = 0;
         UIF_TRANSFER = 0;
         UIF_BUS_RST = 0;                                                        // Clear interrupt flag
-        
-        resetCDCParameters();
     }
     
     // USB bus suspend / wake up
@@ -481,40 +448,33 @@ void USBInterrupt(void) {   //inline not really working in multiple files in SDC
 
 void USBDeviceCfg()
 {
-    USB_CTRL = 0x00;                                                           //??USB?????
-    USB_CTRL &= ~bUC_HOST_MODE;                                                //?????????
-    USB_CTRL |=  bUC_DEV_PU_EN | bUC_INT_BUSY | bUC_DMA_EN;                    //USB?????????,?????????????????NAK
-    USB_DEV_AD = 0x00;                                                         //???????
+    USB_CTRL = 0x00;                                                           //Clear USB control register
+    USB_CTRL &= ~bUC_HOST_MODE;                                                //This bit is the device selection mode
+    USB_CTRL |=  bUC_DEV_PU_EN | bUC_INT_BUSY | bUC_DMA_EN;                    //USB device and internal pull-up enable, automatically return to NAK before interrupt flag is cleared during interrupt
+    USB_DEV_AD = 0x00;                                                         //Device address initialization
     //     USB_CTRL |= bUC_LOW_SPEED;
-    //     UDEV_CTRL |= bUD_LOW_SPEED;                                                //????1.5M??
+    //     UDEV_CTRL |= bUD_LOW_SPEED;                                                //Run for 1.5M
     USB_CTRL &= ~bUC_LOW_SPEED;
-    UDEV_CTRL &= ~bUD_LOW_SPEED;                                             //????12M???????
-    UDEV_CTRL = bUD_PD_DIS;  // ??DP/DM????
-    UDEV_CTRL |= bUD_PORT_EN;                                                  //??????
+    UDEV_CTRL &= ~bUD_LOW_SPEED;                                             //Select full speed 12M mode, default mode
+    UDEV_CTRL = bUD_PD_DIS;                                                     // Disable DP/DM pull-down resistor
+    UDEV_CTRL |= bUD_PORT_EN;                                                  //Enable physical port
 }
 
 void USBDeviceIntCfg()
 {
-    USB_INT_EN |= bUIE_SUSPEND;                                               //????????
-    USB_INT_EN |= bUIE_TRANSFER;                                              //??USB??????
-    USB_INT_EN |= bUIE_BUS_RST;                                               //??????USB??????
-    USB_INT_FG |= 0x1F;                                                       //?????
-    IE_USB = 1;                                                               //??USB??
-    EA = 1;                                                                   //???????
+    USB_INT_EN |= bUIE_SUSPEND;                                               //Enable device hang interrupt
+    USB_INT_EN |= bUIE_TRANSFER;                                              //Enable USB transfer completion interrupt
+    USB_INT_EN |= bUIE_BUS_RST;                                               //Enable device mode USB bus reset interrupt
+    USB_INT_FG |= 0x1F;                                                       //Clear interrupt flag
+    IE_USB = 1;                                                               //Enable USB interrupt
+    EA = 1;                                                                   //Enable global interrupts
 }
 
 void USBDeviceEndPointCfg()
 {
-    UEP1_DMA = (uint16_t) Ep1Buffer;                                                      //??1 ????????
-    UEP2_DMA = (uint16_t) Ep2Buffer;                                                      //??2 ??????
-    UEP2_3_MOD = 0x0C;                                                         //??2 double buffer
-    UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;                //??2??????????IN????NAK
-    UEP2_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;        //??3??????????IN????NAK?OUT??ACK
-    
-    UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK;                //??1??????????IN????NAK
-    UEP0_DMA = (uint16_t) Ep0Buffer;                                                      //??0??????
-    UEP4_1_MOD = 0X40;                                                         //endpoint1 TX enable
-    UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;                //?????OUT????ACK?IN????NAK
+    UEP1_DMA = (uint16_t) Ep1Buffer;                                                      //Endpoint 1 data transfer address
+    UEP1_CTRL = bUEP_AUTO_TOG | UEP_T_RES_NAK | UEP_R_RES_ACK;        //Endpoint 2 automatically flips the sync flag, IN transaction returns NAK, OUT returns ACK
+    UEP0_DMA = (uint16_t) Ep0Buffer;                                                      //Endpoint 0 data transfer address
+    UEP4_1_MOD = 0XC0;                                                         //endpoint1 TX RX enable
+    UEP0_CTRL = UEP_R_RES_ACK | UEP_T_RES_NAK;                //Manual flip, OUT transaction returns ACK, IN transaction returns NAK
 }
-
-#endif
