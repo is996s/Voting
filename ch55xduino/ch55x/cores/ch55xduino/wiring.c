@@ -110,5 +110,7 @@ void init()
     TF0 = 0;
     ET0 = 1;
     TR0 = 1;
+    
+    EA = 1; //millis and delay needs interrupt
 }
 
