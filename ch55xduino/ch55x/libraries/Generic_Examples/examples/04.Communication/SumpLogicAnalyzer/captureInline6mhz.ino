@@ -9,7 +9,7 @@
 
   EA = 0;
 
-  //prepare R0 R7 DPTR
+  //prepare R0 DPTR
   __asm__("  mov r0,#_swapByte       \n"
           "  inc _XBUS_AUX       \n"  //select DPTR1
           "  mov dptr,#(_logicdata-0)       \n"

@@ -10,15 +10,36 @@ void captureInline5mhz() {
   EA = 0;
 
   //prepare R0 DPTR
-  __asm__("  mov r0,#_swapByte       \n"
-          "  inc _XBUS_AUX       \n"  //select DPTR1
-          "  mov dptr,#(_logicdata-0)       \n"
-          "  dec _XBUS_AUX       \n"  //select DPTR0 , set it back
+  __asm__("  mov r0,#_swapByte        \n"
+          "  inc _XBUS_AUX            \n"  //select DPTR1
+          "  mov dptr,#(_logicdata-0) \n"
+          "  dec _XBUS_AUX            \n"  //select DPTR0 , set it back
          );
 
-  if (trigger) {
-    while ((trigger_values ^ P1) & trigger);
-  }
+  __asm__("  sjmp notRet5M$       \n" //only return when UEP2_CTRL changes
+
+          "abortSample5M$:        \n"
+          "  setb  _EA            \n"
+          "  ret                  \n"
+
+          "notRet5M$:"
+          "  mov a,_trigger       \n" //if trigger is set
+          "  jz  NoTrigger5M$     \n"
+          "  mov r5,_UEP2_CTRL    \n"  //backup UEP2_CTRL
+
+          "checkTrigger5M$:"
+
+          "  mov a,_UEP2_CTRL     \n" //abort if UEP2_CTRL changes
+          "  xrl a,r5             \n"
+          "  jnz abortSample5M$   \n"
+
+          "  mov a,_P1            \n"  //(trigger_values ^ P1) & trigger. If result is 0, got triggered.
+          "  xrl a,_trigger_values\n"
+          "  anl a,_trigger       \n"
+          "  jnz checkTrigger5M$  \n"
+
+          "NoTrigger5M$:          \n"
+         );
 
   //P1 is at address 0x90, but it can not be indirectly accessed, because it is on "top" of the ram
 
@@ -53,7 +74,7 @@ void captureInline5mhz() {
 
           "  mov a,r6      \n"  //1+2+2 = 5clk for loop
           "  jnz loop10Samples$\n");
-          
+
 
   //765 pair finished, 3 more needed.
   __asm__(

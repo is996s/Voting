@@ -33,20 +33,39 @@ void captureInlineWithT2() {
 
   TF2 = 0;
 
-  if (divider < 5000) {
-    EA = 0;
-  }
+  EA = 0;
 
   //prepare R0 DPTR
-  __asm__("  mov r0,#_swapByte       \n"
-          "  inc _XBUS_AUX       \n"  //select DPTR1
-          "  mov dptr,#(_logicdata-0)       \n"
-          "  dec _XBUS_AUX       \n"  //select DPTR0 , set it back
+  __asm__("  mov r0,#_swapByte        \n"
+          "  inc _XBUS_AUX            \n"  //select DPTR1
+          "  mov dptr,#(_logicdata-0) \n"
+          "  dec _XBUS_AUX            \n"  //select DPTR0 , set it back
          );
 
-  if (trigger) {
-    while ((trigger_values ^ P1) & trigger);
-  }
+  __asm__("  sjmp notRetT2$       \n" //only return when UEP2_CTRL changes
+
+          "abortSampleT2$:        \n"
+          "  setb  _EA            \n"
+          "  ret                  \n"
+
+          "notRetT2$:"
+          "  mov a,_trigger       \n" //if trigger is set
+          "  jz  NoTriggerT2$     \n"
+          "  mov r5,_UEP2_CTRL    \n"  //backup UEP2_CTRL
+
+          "checkTriggerT2$:"
+
+          "  mov a,_UEP2_CTRL     \n" //abort if UEP2_CTRL changes
+          "  xrl a,r5             \n"
+          "  jnz abortSampleT2$   \n"
+
+          "  mov a,_P1            \n"  //(trigger_values ^ P1) & trigger. If result is 0, got triggered.
+          "  xrl a,_trigger_values\n"
+          "  anl a,_trigger       \n"
+          "  jnz checkTriggerT2$  \n"
+
+          "NoTriggerT2$:          \n"
+         );
 
   //P1 is at address 0x90, but it can not be indirectly accessed, because it is on "top" of the ram
 
@@ -76,7 +95,7 @@ void captureInlineWithT2() {
 
           "  mov a,_P1 \n  xchd A,@r0 \n  .db #0xa5 \n"
           "waitTF2_4$: \n  jnb _TF2,waitTF2_4$ \n  clr _TF2 \n"
-          
+
           "  dec r6      \n"
 
           "  mov a,_P1 \n  swap a \n mov @r0,a \n "
