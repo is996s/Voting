@@ -1,8 +1,8 @@
 /*
-  HID Keyboard example
+  HID Keyboard mouse combo example
 
 
-  created 2020
+  created 2022
   by Deqing Sun for use with CH55xduino
 
   This example code is in the public domain.
@@ -50,7 +50,7 @@ void loop() {
     }
   }
 
-  //button 2 is mapped to string 'hello'
+  //button 2 is mapped to left click
   bool button2Press = !digitalRead(BUTTON2_PIN);
   if (button2PressPrev != button2Press) {
     button2PressPrev = button2Press;
@@ -59,7 +59,7 @@ void loop() {
     }
   }
 
-  //button 3 is mapped to Capslock
+  //button 3 is mapped to move cursor
   bool button3Press = !digitalRead(BUTTON3_PIN);
   if (button3PressPrev != button3Press) {
     button3PressPrev = button3Press;
