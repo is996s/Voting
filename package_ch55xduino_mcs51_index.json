@@ -12,7 +12,7 @@
                 {
                     "name": "CH55xDuino MCS51 plain C core (non-C++)",
                     "architecture": "mcs51",
-                    "version": "0.1",
+                    "version": "0.0.2",
                     "category": "Contributed",
                     "boards": [
                         {"name": "CH552 Board"}
@@ -29,10 +29,10 @@
                             "packager": "CH55xDuino"
                         }
                     ],
-                    "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.1/ch55xduino-core-0.0.1.tar.bz2",
-                    "archiveFileName": "ch55xduino-core-0.0.1.tar.bz2",
-                    "checksum": "SHA-256:45eb98478256c94b5aa4ff148d175dbc2e6d6d48a5744aa1c0e2fb4b93fe8442",
-                    "size": "46461"
+                    "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.2/ch55xduino-core-0.0.2.tar.bz2",
+                    "archiveFileName": "ch55xduino-core-0.0.2.tar.bz2",
+                    "checksum": "SHA-256:91a32a3e344ee5e620acb251e94915e2fb0d14d3d9b3d6f0e210cce15b296d52",
+                    "size": "67804"
                 }
             ],
             "tools" : [
