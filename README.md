@@ -172,4 +172,6 @@ most versions >=1.6.6 should work.
 
 * Windows: Tested on Windows 7 and XP.
 
-* MacOS: tested on 10.14.
+* MacOS: Tested on 10.14.
+
+* Linux: Tested on Ubuntu 20.04 LTS.
