@@ -53,6 +53,10 @@ If you want to leave the bootloader, you may send the following bytes at 57600 b
 
 You can use USB Serial (CDC) driver for default CDC USB stack. If you tried to emulate another type of USB device without changing the PID/VID, you may need to uninstall the device before installing a new driver.
 
+### Permission for Linux
+
+By default, Linux will not expose enough permission for Arduino to upload the code with the USB bootloader. Copy ```99-ch55xbl.rules``` in this repo to ```/etc/udev/rules.d/``` and restart your computer. Otherwise, the upload tool may not find the bootloader device.
+
 ## Reference board
 
 ![Front image](https://raw.githubusercontent.com/DeqingSun/ch55xduino/ch55xduino/docs/simpleCH552Front.jpg)
