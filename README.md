@@ -92,6 +92,8 @@ You will trigger an error. ```?ASlink-Error-Could not get 130 consecutive bytes 
 
 For the default Arduino setting, 148 bytes are reserved for USB endpoints. There will be 876 bytes usable for external RAM.
 
+You can see the memory mapping by opening the map and mem file generated along with the hex file.
+
 ## Known issues
 
 
