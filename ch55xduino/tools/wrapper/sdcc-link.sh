@@ -140,8 +140,45 @@ line="${line//.o	/.rel	}"
 line="${line//.a	/.lib	}"
 vprint 2 "- after substitution: $line"
 
-vprint 1 "cmd: ${ORANGE}$SDCC $line${OFF}"
-"$SDCC" $line
+
+#put rel files with optionalLink name into a lib to do dead code removal
+outPath=""
+for FILE in $line; do
+	if expr "$FILE" : ".*\.elf$" > /dev/null; then
+		outPath="$(dirname "${FILE}")"
+	fi
+done
+optionalLinkLib="$outPath/optionalLink.lib"
+
+lineRel=""
+lineExtractRel=""
+optionalLinkFound="false"
+
+for FILE in $line; do
+	if expr "$FILE" : ".*optionalLink.*\.rel$" > /dev/null; then
+		lineExtractRel="$lineExtractRel	$FILE"
+		if [[ "$optionalLinkFound" == "false" ]]; then
+			lineRel="$lineRel	$optionalLinkLib"
+			optionalLinkFound="true"
+		fi
+	else
+		lineRel="$lineRel	$FILE"
+	fi
+done
+
+if [[ "$optionalLinkFound" == "true" ]]; then
+	if [ -f "$optionalLinkLib" ] ; then
+	    rm "$optionalLinkLib"
+	fi
+	
+	SDAR="$(dirname "${SDCC}")/sdar"
+	for FILE in $lineExtractRel; do
+		"$SDAR"	"rcs" "$optionalLinkLib" "$FILE"
+	done
+fi
+
+vprint 1 "cmd: ${ORANGE}$SDCC $lineRel${OFF}"
+"$SDCC" $lineRel
 
 # propagate the sdcc exit code
 exit $?
