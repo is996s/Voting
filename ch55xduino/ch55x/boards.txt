@@ -7,8 +7,8 @@ ch552.name=CH552 Board
 ch552.upload.tool=vnproch55x
 ch552.upload.protocol=ch55x2_3_1
 #ch552.upload.mcu=ch552
-#CH552 has 16K flash
-ch552.upload.maximum_size=16384
+#CH552 has 16K flash, 2K reserved for bootloader
+ch552.upload.maximum_size=14336
 
 ch552.upload.maximum_data_size=876
 ch552.upload.xdata_location=148
