@@ -16,7 +16,7 @@
                     "category": "Contributed",
                     "boards": [
                         {"name": "CH552 Board"},
-                        {"name": "CH551 Board"},
+                        {"name": "CH551 Board"}
                     ],
                     "toolsDependencies": [
                         {
