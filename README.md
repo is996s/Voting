@@ -9,7 +9,7 @@ CH551/2/4 may be the lowest part count system that works with Arduino. The minim
 
 ![Script running gif](https://raw.githubusercontent.com/DeqingSun/ch55xduino/ch55xduino/docs/blinkLED.gif)
 
-At this moment the project is still working-in-progress. USB-CDC communication, delay, millis, and the digital and analog pin functions are supported. Refer to examples in this repo for more info.
+At this moment the project is still working-in-progress. Support most Arduino functions (Except pulse, shift, tone). Refer to examples in this repo for more info.
 
 ## Installation
 
@@ -36,6 +36,16 @@ Now you should find a new entry *CH55x Boards* in the list at
 * compile it by hitting *Verify*
 * If your board is never used with ch55xduino before, you need to make the ch55x chip enter bootloader mode. You need to disconnect USB and unpower ch55x, connect the pull-up resistor on D+ line (generally a 10K resistor between D+ and 5V, controlled by a push-button or adjacent pads). Then you connect USB. and hit *Upload*. Also, a blank new chip will enter the bootloader automatically.
 * If you have used ch55xduino once and your code doesn't crash the USB subsystem, you can simply press *Upload*. Arduino and the firmware will kick the chip into the bootloader automatically.
+
+## Reference board
+
+![Front image](https://raw.githubusercontent.com/DeqingSun/ch55xduino/ch55xduino/docs/simpleCH552Front.jpg)
+
+![Back image](https://raw.githubusercontent.com/DeqingSun/ch55xduino/ch55xduino/docs/simpleCH552Back.jpg)
+
+There is a small CH552 breakout board design in the "pcb" folder. When fabricated with 1.6mm board thickness, some USB receptacle may be too loose for the PCB. Just add some tape behind the USB connector to increase the thickness.
+
+The button footprint was designed for 6mm buttons, but 5mm one works too.
 
 ## Difference to regular Arduino
 
@@ -99,6 +109,10 @@ You can see the memory mapping by opening the map and mem file generated along w
 Note that when some function is called from an interrupt service routine it should be preceded by a #pragma NOOVERLAY (if it is not reentrant) . A special note here, int (16 bit) and long (32 bit) integer division, multiplication & modulus operations are implemented using external support routines developed in ANSI-C, if an interrupt service routine needs to do any of these operations then the support routines (as mentioned in a following section) will have to recompiled using the --stack-auto option and the source file will need to be compiled using the --int-long-rent compiler option. [src](http://fivedots.coe.psu.ac.th/~cj/masd/resources/sdcc-doc/SDCCUdoc-11.html)
 
 With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ( ) in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable to place the function prototype in a header file as long as the header file is included in the file that contains main ( ).  SDCC will not generate any warnings or errors if this is not done, but the vector will not be in place so the ISR will not be executed when the interrupt occurs. [src](https://www.silabs.com/community/mcu/8-bit/knowledge-base.entry.html/2007/11/16/common_pitfalls_when-E7zi)
+
+### Reset Pins
+
+Unlike AVR chips, CH55x will reset when the RST pin is High. The reset pin may be configured as an input pin. But such configuration requires modification of Configuration Information byte, which require an external tool to do so.
 
 ## Known issues
 
