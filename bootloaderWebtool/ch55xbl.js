@@ -376,13 +376,65 @@ function parseIntelHex(data, bufferSize) {
     throw new Error("Unexpected end of input: missing or invalid EOF record.");
 };
 
+function dropHandler(ev) {
+    console.log('File(s) dropped');
+
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+
+    hexFile = undefined;
+
+    if (ev.dataTransfer.items) {
+        // Use DataTransferItemList interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.items.length; i++) {
+            // If dropped items aren't files, reject them
+            if (ev.dataTransfer.items[i].kind === 'file') {
+                var file = ev.dataTransfer.items[i].getAsFile();
+                if (i == 0) {
+                    hexFile = file;
+                }
+            }
+        }
+    } else {
+        // Use DataTransfer interface to access the file(s)
+        for (var i = 0; i < ev.dataTransfer.files.length; i++) {
+            if (i == 0) {
+                hexFile = ev.dataTransfer.files[i];
+            }
+        }
+    }
+
+    if (hexFile) {
+        var reader = new FileReader();
+        // Closure to capture the file information.
+        reader.onload = (function (theFile) {
+            return function (e) {
+                var hexContent = e.target.result
+                uploadCH55xBootloader(parseIntelHex(hexContent, 63 * 1024).data)
+            };
+        })(file);
+        reader.readAsText(file);
+    }
+
+}
+
+function dragOverHandler(ev) {
+    //console.log('File(s) in drop zone'); 
+
+    // Prevent default behavior (Prevent file from being opened)
+    ev.preventDefault();
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     let connectButton = document.querySelector('#connect');
     let uploadButton = document.querySelector('#upload');
+    let dropZoneDiv = document.querySelector('#drop_zone');
     statusDiv = document.querySelector('#status');
 
     connectButton.addEventListener('click', connectCH55xBootloader);
     uploadButton.addEventListener('click', pressUpload);
+    dropZoneDiv.addEventListener('drop', dropHandler, false);
+    dropZoneDiv.addEventListener('dragover', dragOverHandler, false)
+
     document.getElementById('fileid').addEventListener('change', handleFileSelect, false);
 }, false);
