@@ -14,7 +14,7 @@ __xdata uint8_t LineCoding[LINE_CODEING_SIZE]={0x00,0xe1,0x00,0x00,0x00,0x00,0x0
 volatile __xdata uint8_t USBByteCountEP2 = 0;      //Bytes of received data on USB endpoint
 volatile __xdata uint8_t USBBufOutPointEP2 = 0;    //Data pointer for fetching
 
-volatile __xdata uint8_t UpPoint2_Busy  = 0;   //Flag of whether upload pointer is busy
+volatile __bit UpPoint2BusyFlag  = 0;   //Flag of whether upload pointer is busy
 volatile __xdata uint8_t controlLineState = 0;
 
 __xdata uint8_t usbWritePointer = 0;
@@ -24,7 +24,7 @@ void delayMicroseconds(uint16_t us);
 void resetCDCParameters(){
 
     USBByteCountEP2 = 0;       //Bytes of received data on USB endpoint
-    UpPoint2_Busy = 0;
+    UpPoint2BusyFlag = 0;
 }
 
 void setLineCodingHandler(){
@@ -71,10 +71,10 @@ bool USBSerial(){
 
 
 void USBSerial_flush(void){
-    if (!UpPoint2_Busy && usbWritePointer>0){
+    if (!UpPoint2BusyFlag && usbWritePointer>0){
         UEP2_T_LEN = usbWritePointer;                                                   
         UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_ACK;            //Respond ACK
-        UpPoint2_Busy = 1;
+        UpPoint2BusyFlag = 1;
         usbWritePointer = 0;
     }
 }
@@ -84,7 +84,7 @@ uint8_t USBSerial_write(char c){  //3 bytes generic pointer
     if (controlLineState > 0) {
         while (true){
             waitWriteCount = 0;
-            while (UpPoint2_Busy){//wait for 250ms or give up, on my mac it takes about 256us
+            while (UpPoint2BusyFlag){//wait for 250ms or give up, on my mac it takes about 256us
                 waitWriteCount++;
                 delayMicroseconds(5);
                 if (waitWriteCount>=50000) return 0;
@@ -106,7 +106,7 @@ uint8_t USBSerial_print_n(uint8_t * __xdata buf, __xdata int len){  //3 bytes ge
     if (controlLineState > 0) {
         while (len>0){
             waitWriteCount = 0;
-            while (UpPoint2_Busy){//wait for 250ms or give up, on my mac it takes about 256us
+            while (UpPoint2BusyFlag){//wait for 250ms or give up, on my mac it takes about 256us
                 waitWriteCount++;
                 delayMicroseconds(5);   
                 if (waitWriteCount>=50000) return 0;
@@ -144,7 +144,7 @@ char USBSerial_read(){
 void USB_EP2_IN(){
     UEP2_T_LEN = 0;                                                    // No data to send anymore
     UEP2_CTRL = UEP2_CTRL & ~ MASK_UEP_T_RES | UEP_T_RES_NAK;           //Respond NAK by default
-    UpPoint2_Busy = 0;                                                  //Clear busy flag
+    UpPoint2BusyFlag = 0;                                                  //Clear busy flag
 }
 
 void USB_EP2_OUT(){

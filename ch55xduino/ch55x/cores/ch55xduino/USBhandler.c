@@ -21,8 +21,6 @@ uint8_t SetupReq,UsbConfig;
 
 __code uint8_t *pDescr;
 
-volatile uint8_t usbMsgFlags=0;    // uint8_t usbMsgFlags copied from VUSB
-
 inline void NOP_Process(void) {}
 
 void USB_EP0_SETUP(){
@@ -32,7 +30,6 @@ void USB_EP0_SETUP(){
         SetupLen = ((uint16_t)UsbSetupBuf->wLengthH<<8) | (UsbSetupBuf->wLengthL);
         len = 0;                                                      // Default is success and upload 0 length
         SetupReq = UsbSetupBuf->bRequest;
-        usbMsgFlags = 0;
         if ( ( UsbSetupBuf->bRequestType & USB_REQ_TYP_MASK ) != USB_REQ_TYP_STANDARD )//Not standard request
         {
             

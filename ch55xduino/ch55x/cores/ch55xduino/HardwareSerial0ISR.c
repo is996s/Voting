@@ -6,7 +6,7 @@ volatile __xdata uint8_t uart0_rx_buffer_head=0;
 volatile __xdata uint8_t uart0_rx_buffer_tail=0;
 volatile __xdata uint8_t uart0_tx_buffer_head=0;
 volatile __xdata uint8_t uart0_tx_buffer_tail=0;
-volatile __xdata uint8_t uart0_flags=0;
+volatile __bit uart0_flag_sending=0;
 
 void uart0IntRxHandler(){
     uint8_t nextHead = (uart0_rx_buffer_head + 1) % SERIAL0_RX_BUFFER_SIZE;
@@ -18,10 +18,10 @@ void uart0IntRxHandler(){
 }
 
 void uart0IntTxHandler(){
-    if ((uart0_flags & UART0_FLG_SENDING)){
+    if (uart0_flag_sending){
         if (uart0_tx_buffer_head == uart0_tx_buffer_tail){
             //do no more
-            uart0_flags &= ~(UART0_FLG_SENDING);
+            uart0_flag_sending &= 0;
         }else{
             SBUF=Transmit_Uart0_Buf[uart0_tx_buffer_tail];
             uart0_tx_buffer_tail = (uart0_tx_buffer_tail + 1) % SERIAL0_TX_BUFFER_SIZE;

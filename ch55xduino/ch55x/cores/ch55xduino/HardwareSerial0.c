@@ -8,7 +8,7 @@ extern volatile __xdata uint8_t uart0_rx_buffer_head;
 extern volatile __xdata uint8_t uart0_rx_buffer_tail;
 extern volatile __xdata uint8_t uart0_tx_buffer_head;
 extern volatile __xdata uint8_t uart0_tx_buffer_tail;
-extern volatile __xdata uint8_t uart0_flags;
+extern volatile __bit uart0_flag_sending;
 
 //extern wait functions
 void delayMicroseconds(uint16_t us);
@@ -49,8 +49,8 @@ void Serial0_begin(unsigned long baud){
 
 uint8_t Serial0_write(uint8_t SendDat)
 {
-    if ((uart0_tx_buffer_head == uart0_tx_buffer_tail) && ( (uart0_flags & UART0_FLG_SENDING)==0)){    //start to send
-        uart0_flags |= UART0_FLG_SENDING;
+    if ( (uart0_tx_buffer_head == uart0_tx_buffer_tail) && (uart0_flag_sending==0) ){    //start to send
+        uart0_flag_sending = 1;
         SBUF = SendDat;
         return 1;
     }
@@ -71,7 +71,7 @@ uint8_t Serial0_write(uint8_t SendDat)
 }
 
 void Serial0_flush(void){
-    while( (uart0_flags & UART0_FLG_SENDING) );
+    while( uart0_flag_sending );
 }
 
 uint8_t Serial0_available(void){
