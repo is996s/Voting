@@ -96,27 +96,27 @@ void USB_EP0_SETUP(){
                         }
                         else if(UsbSetupBuf->wValueL == 1)
                         {
-                            pDescr = Manuf_Des;
+                            pDescr = (__code uint8_t *)Manuf_Des;
                             len = Manuf_DesLen;
                         }
                         else if(UsbSetupBuf->wValueL == 2)
                         {
-                            pDescr = Prod_Des;
+                            pDescr = (__code uint8_t *)Prod_Des;
                             len = Prod_DesLen;
                         }
                         else if(UsbSetupBuf->wValueL == 3)
                         {
-                            pDescr = SerDes;
+                            pDescr = (__code uint8_t *)SerDes;
                             len = SerDesLen;
                         }
                         else if(UsbSetupBuf->wValueL == 4)
                         {
-                            pDescr = CDC_Des;
+                            pDescr = (__code uint8_t *)CDC_Des;
                             len = CDC_DesLen;
                         }
                         else
                         {
-                            pDescr = SerDes;
+                            pDescr = (__code uint8_t *)SerDes;
                             len = SerDesLen;
                         }
                         break;
