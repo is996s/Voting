@@ -269,43 +269,47 @@ char USBSerial_read();
 // not quite understans X marco in sduino, use a lot define for now
 
 #define USBSerial_print_s(P) ( Print_print_s(USBSerial_write,(P)) )
-#define USBSerial_print_sn(P) ( Print_print_sn(USBSerial_write,(P)) )
+#define USBSerial_print_sn(P,Q) ( Print_print_sn(USBSerial_write,(P),(Q)) )
 #define USBSerial_print_i(P) ( Print_print_i(USBSerial_write,(P)) )
 #define USBSerial_print_u(P) ( Print_print_u(USBSerial_write,(P)) )
 #define USBSerial_print_ib(P) ( Print_print_ib(USBSerial_write,(P)) )
 #define USBSerial_print_ub(P,Q) ( Print_print_ub(USBSerial_write,(P),(Q)) )
 #define USBSerial_print_f(P) ( Print_print_f(USBSerial_write,(P)) )
 #define USBSerial_print_fd(P,Q) ( Print_print_fd(USBSerial_write,(P),(Q)) )
+#define USBSerial_print_c(P) ( (USBSerial_write(P)) )
 
 #define USBSerial_println() ( Print_println(USBSerial_write) )
 #define USBSerial_println_s(P) ( Print_print_s(USBSerial_write,(P)) + Print_println(USBSerial_write) )
-#define USBSerial_println_sn(P) ( Print_print_sn(USBSerial_write,(P)) + Print_println(USBSerial_write) )
+#define USBSerial_println_sn(P,Q) ( Print_print_sn(USBSerial_write,(P),(Q)) + Print_println(USBSerial_write) )
 #define USBSerial_println_i(P) ( Print_print_i(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_u(P) ( Print_print_u(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_ib(P) ( Print_print_ib(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_ub(P,Q) ( Print_print_ub(USBSerial_write,(P),(Q)) + Print_println(USBSerial_write) )
 #define USBSerial_println_f(P) ( Print_print_f(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_fd(P,Q) ( Print_print_fd(USBSerial_write,(P),(Q) ) + Print_println(USBSerial_write) )
+#define USBSerial_println_c(P) ( (USBSerial_write(P)) + Print_println(USBSerial_write) )
 
 
 #define Serial0_print_s(P) ( Print_print_s(Serial0_write,(P)) )
-#define Serial0_print_sn(P) ( Print_print_sn(Serial0_write,(P)) )
+#define Serial0_print_sn(P,Q) ( Print_print_sn(Serial0_write,(P),(Q)) )
 #define Serial0_print_i(P) ( Print_print_i(Serial0_write,(P)) )
 #define Serial0_print_u(P) ( Print_print_u(Serial0_write,(P)) )
 #define Serial0_print_ib(P) ( Print_print_ib(Serial0_write,(P)) )
 #define Serial0_print_ub(P,Q) ( Print_print_ub(Serial0_write,(P),(Q)) )
 #define Serial0_print_f(P) ( Print_print_f(Serial0_write,(P)) )
 #define Serial0_print_fd(P,Q) ( Print_print_fd(Serial0_write,(P),(Q)) )
+#define Serial0_print_c(P) ( (Serial0_write(P)) )
 
 #define Serial0_println() ( Print_println(Serial0_write) )
 #define Serial0_println_s(P) ( Print_print_s(Serial0_write,(P)) + Print_println(Serial0_write) )
-#define Serial0_println_sn(P) ( Print_print_sn(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_sn(P,Q) ( Print_print_sn(Serial0_write,(P),(Q)) + Print_println(Serial0_write) )
 #define Serial0_println_i(P) ( Print_print_i(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_u(P) ( Print_print_u(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_ib(P) ( Print_print_ib(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_ub(P,Q) ( Print_print_ub(Serial0_write,(P),(Q)) + Print_println(Serial0_write) )
 #define Serial0_println_f(P) ( Print_print_f(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_fd(P,Q) ( Print_print_fd(Serial0_write,(P),(Q) ) + Print_println(Serial0_write) )
+#define Serial0_println_c(P) ( (Serial0_write(P)) + Print_println(Serial0_write) )
 
 
 #endif
