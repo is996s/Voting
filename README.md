@@ -99,8 +99,15 @@ You can see the memory mapping by opening the map and mem file generated along w
 
 ## Included libraries
 
-To be added. No library yet.
+Most parts of the Arduino core system and some Arduino libraries are already ported to C-syntax. The resulting API is still very close to the C++ version and porting an existing application is not hard. Refer to the examples that come with the libraries.
 
+#### Communication
+
+* SPI: Real hardware-SPI up to 12MHz.
+
+#### Sensors
+
+* TouchKey: Internal 6-channel capacitive touch module wrapper with an adaptive baseline algorithm.
 
 ## Compatibility with the Arduino world
 
