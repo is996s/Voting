@@ -94,6 +94,12 @@ For the default Arduino setting, 148 bytes are reserved for USB endpoints. There
 
 You can see the memory mapping by opening the map and mem file generated along with the hex file.
 
+#### Common Pitfalls when Using SDCC
+
+Note that when some function is called from an interrupt service routine it should be preceded by a #pragma NOOVERLAY (if it is not reentrant) . A special note here, int (16 bit) and long (32 bit) integer division, multiplication & modulus operations are implemented using external support routines developed in ANSI-C, if an interrupt service routine needs to do any of these operations then the support routines (as mentioned in a following section) will have to recompiled using the --stack-auto option and the source file will need to be compiled using the --int-long-rent compiler option. [src](http://fivedots.coe.psu.ac.th/~cj/masd/resources/sdcc-doc/SDCCUdoc-11.html)
+
+With SDCC, interrupt service routine function prototypes must be placed in the file that contains main ( ) in order for an vector for the interrupt to be placed in the the interrupt vector space.  It's acceptable to place the function prototype in a header file as long as the header file is included in the file that contains main ( ).  SDCC will not generate any warnings or errors if this is not done, but the vector will not be in place so the ISR will not be executed when the interrupt occurs. [src](https://www.silabs.com/community/mcu/8-bit/knowledge-base.entry.html/2007/11/16/common_pitfalls_when-E7zi)
+
 ## Known issues
 
 
