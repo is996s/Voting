@@ -111,6 +111,8 @@ USBSerial_print(charPointer, length)	//specifies the string length to be printed
 
 It is also possible to do ``` USBSerial_println ```. If you want to print to Serial0 or Serial1, just use ``` Serial0_print ``` or ``` Serial1_print ```.
 
+Please note if you pass a character in single quotes, such as ```USBSerial_print(',');```, you will get ```44```. Because that char got promoted to integer type. You need to either use ```USBSerial_print((char)',');``` or ```USBSerial_print(",");```.
+
 They are defined in ```genericPrintSelection.h```.
 
 ### Memory model:
