@@ -97,22 +97,21 @@ There is no Analog Pin definition such as A0. Just use 11, 14, 15, or 32 for the
 
 ### No polymorph functions:
 
-There is no free C++ compiler for MCS51 chip, we can not use polymorph functions. So you can not expect the compiler will choose a function according to the parameter's type. 
+There is no free C++ compiler for MCS51 chip, we can not use polymorph functions. However, since commit 13402 of SDCC, the generic selection is functional. Ch55xduino supports generic selection since 0.0.11.
 
-The biggest difference may be the ```Serial.print``` function. Here is what you should do in CH55xduino
+If you are using a version higher than 0.0.11, the print function can choose a function according to the parameter's type. 
 
-| datatype | Print on USB | Println on USB | Print on UART0 | Println on UART0 |
-|----------|--------------|----------------|----------------|------------------|
-| int      | USBSerial\_print\_i(P) | USBSerial\_println\_i(P) | Serial0\_print\_i(P) | Serial0\_println\_i(P) |
-| unsigned | USBSerial\_print\_u(P) | USBSerial\_println\_u(P) | Serial0\_print\_u(P) | Serial0\_println\_u(P) |
-| float    | USBSerial\_print\_f(P) | USBSerial\_println\_f(P) | Serial0\_print\_f(P) | Serial0\_println\_f(P) |
-| float with precision | USBSerial\_print\_f(P,Q) | USBSerial\_println\_f(P,Q) | Serial0\_print\_f(P,Q) | Serial0\_println\_f(P,Q) |
-| char     | USBSerial\_print\_c(P) | USBSerial\_println\_c(P) | Serial0\_print\_c(P) | Serial0\_println\_c(P) |
-| char * (str)  | USBSerial\_print\_s(P) | USBSerial\_println\_s(P) | Serial0\_print\_s(P) | Serial0\_println\_s(P) |
-| char array with length | USBSerial\_print\_sn(P,Q) | USBSerial\_println\_sn(P,Q) | Serial0\_print\_sn(P,Q) | Serial0\_println\_sn(P,Q) |
-| int with base | USBSerial\_print\_ub(P,Q) | USBSerial\_println\_ub(P,Q) | Serial0\_print\_ub(P,Q) | Serial0\_println\_ub(P,Q) |
+For example. If you want to print to the USB-CDC virtual serial port, you can do:
 
-They are defined in ```Arduino.h```.
+```
+USBSerial_print(val);	//val: the value to print - any data type
+USBSerial_print(val, format)	//specifies the number base (for integral data types) or number of decimal places (for floating point types)
+USBSerial_print(charPointer, length)	//specifies the string length to be printed 
+```
+
+It is also possible to do ``` USBSerial_println ```. If you want to print to Serial0 or Serial1, just use ``` Serial0_print ``` or ``` Serial1_print ```.
+
+They are defined in ```genericPrintSelection.h```.
 
 ### Memory model:
 
