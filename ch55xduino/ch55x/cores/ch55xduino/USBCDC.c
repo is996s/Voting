@@ -19,8 +19,7 @@ volatile __xdata uint8_t controlLineState = 0;
 
 __xdata uint8_t usbWritePointer = 0;
 
-void mDelayuS( uint16_t n );
-void mDelaymS( uint16_t n );
+void delayMicroseconds(uint16_t us);
 
 void resetCDCParameters(){
 
@@ -54,7 +53,8 @@ void setControlLineStateHandler(){
     if ( ((controlLineState & 0x01) == 0) && (*((__xdata uint32_t *)LineCoding) == 1200) ){ //both linecoding and sdcc are little-endian
         USB_CTRL = 0;
         EA = 0;                                                                    //Disabling all interrupts is required.
-        mDelaymS( 100 );     
+        delayMicroseconds(50000);
+        delayMicroseconds(50000);
         __asm__ ("lcall #0x3800");                                                 //Jump to bootloader code
         while(1);
     }
@@ -65,7 +65,7 @@ bool USBSerial(){
     bool result = false;
     if (controlLineState > 0)
         result = true;
-    //mDelaymS(10); not doing it for now
+    //delay(10); not doing it for now
     return result;
 }
 
@@ -86,7 +86,7 @@ uint8_t USBSerial_write(char c){  //3 bytes generic pointer
             waitWriteCount = 0;
             while (UpPoint2_Busy){//wait for 250ms or give up, on my mac it takes about 256us
                 waitWriteCount++;
-                mDelayuS(5);   
+                delayMicroseconds(5);
                 if (waitWriteCount>=50000) return 0;
             }
             if (usbWritePointer<MAX_PACKET_SIZE){
@@ -108,7 +108,7 @@ uint8_t USBSerial_print_n(uint8_t * __xdata buf, __xdata int len){  //3 bytes ge
             waitWriteCount = 0;
             while (UpPoint2_Busy){//wait for 250ms or give up, on my mac it takes about 256us
                 waitWriteCount++;
-                mDelayuS(5);   
+                delayMicroseconds(5);   
                 if (waitWriteCount>=50000) return 0;
             }
             while (len>0){

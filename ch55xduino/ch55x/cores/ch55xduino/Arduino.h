@@ -186,7 +186,7 @@ void analogWrite(uint8_t pin, __xdata uint16_t val);
 uint32_t millis(void);
 uint32_t micros(void);
 void delay(uint32_t ms);
-//void delayMicroseconds(unsigned int us);
+void delayMicroseconds(uint16_t us);
 //unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
 //unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 

@@ -1,7 +1,5 @@
 #include "wiring_private.h"
 
-void mDelaymS( uint16_t n );    //used for delay without timer
-
 #ifndef USER_USB_RAM
 void USBDeviceCfg();
 void USBDeviceIntCfg();
@@ -59,6 +57,60 @@ void delay(uint32_t ms)
     }
 }
 
+void delayMicroseconds(uint16_t us){
+#ifdef    F_CPU
+#if        F_CPU <= 6000000
+    us >>= 2;
+#endif
+#if        F_CPU <= 3000000
+    us >>= 2;
+#endif
+#if        F_CPU <= 750000
+    us >>= 4;
+#endif
+#endif
+    
+    // in arduino setup, the code above seems useless (clock generally much higher than 6M).
+    
+    while ( us ) {  // total = 12~13 Fsys cycles, 1uS @Fsys=12MHz
+//        ++ SAFE_MOD;  // 2 Fsys cycles, for higher Fsys, add operation here
+
+#ifdef    F_CPU
+#if        F_CPU >= 14000000
+//        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 16000000
+//        ++ SAFE_MOD;  //seems SDCC is not very efficent, dirty tweak for a little more accuracy, but still not very accurate. accurate time need carefull planning and word alignment. Maybe for later.
+#endif
+#if        F_CPU >= 18000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 20000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 22000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 24000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 26000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 28000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 30000000
+        ++ SAFE_MOD;
+#endif
+#if        F_CPU >= 32000000
+        ++ SAFE_MOD;
+#endif
+#endif
+        -- us;
+    }
+}
+
 void init()
 {
     //set internal clock 
@@ -87,7 +139,7 @@ void init()
     
     SAFE_MOD = 0x00;
     
-    mDelaymS(5); //needed to stablize internal RC
+    delayMicroseconds(5000); //needed to stablize internal RC
     
 #ifndef USER_USB_RAM
     //init USB

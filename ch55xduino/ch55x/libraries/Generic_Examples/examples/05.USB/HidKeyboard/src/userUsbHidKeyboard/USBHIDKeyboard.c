@@ -148,8 +148,7 @@ __code uint8_t _asciimap[128] =
 
 typedef void( *pTaskFn)( void );
 
-void mDelayuS( uint16_t n );
-void mDelaymS( uint16_t n );
+void delayMicroseconds(uint16_t us);
 
 void USBInit(){
     USBDeviceCfg();                                                       //Device mode configuration
@@ -182,7 +181,7 @@ uint8_t USB_EP1_send(){
     waitWriteCount = 0;
     while (UpPoint1_Busy){//wait for 250ms or give up
         waitWriteCount++;
-        mDelayuS(5);   
+        delayMicroseconds(5);   
         if (waitWriteCount>=50000) return 0;
     }
     
