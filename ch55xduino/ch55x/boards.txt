@@ -1,11 +1,10 @@
 # See: http://code.google.com/p/arduino/wiki/Platforms
 
-#menu.upload_method=Upload method
 menu.usb_settings=USB Settings
+menu.upload_method=Upload method
 ##############################################################
 
 ch552.name=CH552 Board
-ch552.upload.tool=vnproch55x
 ch552.upload.protocol=ch55x2_3_1
 #ch552.upload.mcu=ch552
 #CH552 has 16K flash, but 2K is for bootloader, 14K usable
@@ -36,6 +35,13 @@ ch552.menu.usb_settings.user0.upload.maximum_data_size=1024
 ch552.menu.usb_settings.user0.upload.xdata_location=0
 ch552.menu.usb_settings.user0.build.extra_flags=--model-small -DUSER_USB_RAM=0
 
+## ----------------------------------------------
+ch552.menu.upload_method.usb=USB
+ch552.menu.upload_method.usb.upload.tool=vnproch55x_usb
+## ----
+ch552.menu.upload_method.serial=Serial
+ch552.menu.upload_method.serial.upload.tool=vnproch55x_serial
+
 # meaningless variables just to keep the makefile happy
 
 ch552.upload.speed=1
@@ -43,7 +49,7 @@ ch552.upload.speed=1
 ##############################################################
 
 ch551.name=CH551 Board
-ch551.upload.tool=vnproch55x
+ch551.upload.tool=vnproch55x_usb
 ch551.upload.protocol=ch55x2_3_1
 #CH551 has 10K flash
 ch551.upload.maximum_size=10240
