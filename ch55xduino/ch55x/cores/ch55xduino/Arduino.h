@@ -121,8 +121,8 @@ void yield(void);
 #define degrees(rad) ((rad)*RAD_TO_DEG)
 #define sq(x) ((x)*(x))
 
-#define interrupts() sei()
-#define noInterrupts() cli()
+#define interrupts() (EA=1)
+#define noInterrupts() (EA=0)
 
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesPerMillisecond() ( F_CPU / 1000L )
