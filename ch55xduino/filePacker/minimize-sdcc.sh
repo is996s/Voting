@@ -51,9 +51,14 @@ TAR_EXCLUDE='--exclude=doc	--exclude=src 	--exclude=non-free
 --exclude=bin/sm* --exclude=bin/sp* --exclude=bin/sr*  --exclude=bin/ss*  --exclude=bin/sx*
 '
 
-ZIP_EXCLUDE='-x */non-free/* */src/* *stlcs* */pic*
-*00* *08* *80* *90* *51* *2k* *gb* *ka* */info/* *pdk* *rab*
-*/huge/* */large* */medium/* */small*'
+ZIP_EXCLUDE='-x */doc/* */man/* */non-free/* */src/* *stlcs* */pic*
+*00* *08* *z80* *z180* *90* *2k* *gb* *ka* */info/* *pdk* *rab* *stm*
+*/huge/* */large* */medium/* */mos6502* */sm83* */small-stack-auto/*
+*/ucsim*.exe */include/mcs51/*
+*/bin/makebin.exe */bin/packihx.exe */bin/s51.exe */bin/savr.exe
+*/bin/sdcdb* */bin/sdnm.exe */bin/sdobjcopy.exe
+*/bin/sdranlib.exe */bin/sm*.exe */bin/sp*.exe */bin/sr*.exe */bin/ss*.exe */bin/sx*.exe
+'
 
 TMP=$(mktemp -d sdcc-repack-XXXXXX)
 
