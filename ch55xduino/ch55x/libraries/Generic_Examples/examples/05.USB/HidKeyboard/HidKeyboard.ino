@@ -9,6 +9,9 @@
 
 */
 
+//For windows user, if you ever played with other HID device with the same PID C55D
+//You may need to uninstall the previous driver completely        
+
 
 #ifndef USER_USB_RAM
 #error "This example needs to be compiled with a USER USB setting"

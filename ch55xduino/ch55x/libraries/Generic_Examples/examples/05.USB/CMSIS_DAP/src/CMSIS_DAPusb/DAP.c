@@ -988,9 +988,10 @@ static uint8_t DAP_WriteAbort(const uint8_t *req, uint8_t *res)
 }
 
 // DAP Thread.
-void DAP_Thread(void)
+uint8_t DAP_Thread(void)
 {
     uint8_t num;
+    uint8_t returnVal = 0;
 
     if (1)
     {
@@ -1070,6 +1071,8 @@ void DAP_Thread(void)
             break;
         }
 
-        Ep1Buffer[64] = num + 1;
+        returnVal = num + 1;
     }
+    
+    return returnVal;
 }
