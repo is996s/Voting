@@ -9,6 +9,24 @@ void USBDeviceEndPointCfg();
 extern __idata volatile uint32_t timer0_overflow_count;
 extern __idata volatile uint8_t timer0_overflow_count_5th_byte;
 
+void Timer0Interrupt(void) __interrupt (INT_NO_TMR0) __using(1) //using register bank 1
+{
+    /*timer0_overflow_count++;
+     */ //when putting timer0_millis and timer0_overflow_count in bank 1, C code is no longer correct
+    __asm__ (";Increase timer0_overflow_count on R0~R4(5bytes)\n"
+             "    inc r0                                   \n"
+             "    cjne r0,#0,incTimer0_overflow_countOver$ \n"
+             "    inc r1                                   \n"
+             "    cjne r1,#0,incTimer0_overflow_countOver$ \n"
+             "    inc r2                                   \n"
+             "    cjne r2,#0,incTimer0_overflow_countOver$ \n"
+             "    inc r3                                   \n"
+             "    cjne r3,#0,incTimer0_overflow_countOver$ \n"
+             "    inc r4                                   \n"
+             "incTimer0_overflow_countOver$:               \n"
+             );
+}
+
 uint32_t micros(){
     /*uint32_t m;
      uint8_t t;

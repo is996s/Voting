@@ -33,23 +33,7 @@ void DeviceUSBInterrupt(void) __interrupt (INT_NO_USB)                       //U
 __idata __at (0x08) volatile uint32_t timer0_overflow_count = 0;
 __idata __at (0x0C) volatile uint8_t timer0_overflow_count_5th_byte = 0;
 
-void Timer0Interrupt(void) __interrupt (INT_NO_TMR0) __using(1) //using register bank 1
-{
-    /*timer0_overflow_count++;
-    */ //when putting timer0_millis and timer0_overflow_count in bank 1, C code is no longer correct
-    __asm__ (";Increase timer0_overflow_count on R0~R4(5bytes)\n"
-             "    inc r0                                   \n"
-             "    cjne r0,#0,incTimer0_overflow_countOver$ \n"
-             "    inc r1                                   \n"
-             "    cjne r1,#0,incTimer0_overflow_countOver$ \n"
-             "    inc r2                                   \n"
-             "    cjne r2,#0,incTimer0_overflow_countOver$ \n"
-             "    inc r3                                   \n"
-             "    cjne r3,#0,incTimer0_overflow_countOver$ \n"
-             "    inc r4                                   \n"
-             "incTimer0_overflow_countOver$:               \n"
-             );
-}
+void Timer0Interrupt(void) __interrupt (INT_NO_TMR0) __using(1); //located in wiring.c, using register bank 1
 
 void Uart0_ISR(void) __interrupt (INT_NO_UART0)
 {
