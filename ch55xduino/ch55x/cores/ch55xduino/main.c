@@ -64,6 +64,15 @@ void INT1_ISR(void) __interrupt (INT_NO_INT1)
     intFunc[1]();
 }
 
+__xdata voidFuncPtr touchKeyHandler = NULL;
+void TOUCHKEY_ISR(void) __interrupt (INT_NO_TKEY)
+{
+    if (touchKeyHandler!=NULL){
+        touchKeyHandler();
+    }
+}
+
+
 int main(void)
 {
 	init();
