@@ -94,8 +94,8 @@ async function connectCH55xBootloader() {
     result = await device.transferIn(endpointIn, 64);
     resultUint8 = new Uint8Array(result.data.buffer)
     bootloaderVersion = resultUint8[19] + '.' + resultUint8[20] + '.' + resultUint8[21]
-    if (bootloaderVersion != '2.3.1') {
-        statusDiv.innerHTML = 'bootloader Version supported: ' + bootloaderVersion;
+    if (bootloaderVersion != '2.3.1' && bootloaderVersion != '2.4.0' ) {
+        statusDiv.innerHTML = 'bootloader Version not supported: ' + bootloaderVersion;
         return 0;
     }
     bootloaderID = [resultUint8[22], resultUint8[23], resultUint8[24], resultUint8[25]];
