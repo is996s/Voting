@@ -33,6 +33,8 @@
 #include "include/ch554.h"
 #include "include/ch554_usb.h"
 #include "pins_arduino_include.h"
+//Macro-based digital IO fucntions
+#include "wiring_digital_fast.h"
 
 //!!!!#include "binary.h"
 
