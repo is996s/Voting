@@ -397,8 +397,8 @@
                             "host": "x86_64-pc-linux-gnu",
                             "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.11/sdcc-mcs51-amd64-ubuntu20.04-linux2.5-20220422-13407.tar.bz2",
                             "archiveFileName": "sdcc-mcs51-amd64-ubuntu20.04-linux2.5-20220422-13407.tar.bz2",
-                            "checksum": "SHA-256:0b45850bb341d7527bb5178a0983d394cb25c41bdf0bd464e1a60b849a71cad9",
-                            "size": "20384811"
+                            "checksum": "SHA-256:e2b5947b962a185e1ad87e9b71c230517b013a3ccebc214e3f2160ae9819931a",
+                            "size": "3685666"
                         },{
                             "host": "i686-mingw32",
                             "url": "https://github.com/DeqingSun/ch55xduino/releases/download/0.0.11/sdcc-mcs51-i586-mingw32msvc-20220422-13407.tar.bz2",
