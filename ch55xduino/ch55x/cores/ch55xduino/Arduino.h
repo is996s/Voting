@@ -78,9 +78,7 @@ void yield(void);
 #define LSBFIRST 0
 #define MSBFIRST 1
 
-#define CHANGE 1
-#define FALLING 2
-#define RISING 3
+#define FALLING 1
 
 /*
 #if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__)
@@ -173,11 +171,11 @@ typedef unsigned char byte;
 //typedef uint8_t byte;
 
 void init(void);
-void initVariant(void);		// weak
+//void initVariant(void);		// weak
 
-int atexit(void (*func)());	// __attribute__((weak));
-void serialEvent(void);		// weak
-extern unsigned char runSerialEvent;
+//int atexit(void (*func)());	// __attribute__((weak));
+//void serialEvent(void);		// weak
+//extern unsigned char runSerialEvent;
 
 void pinMode(uint8_t pin, __xdata uint8_t mode);
 void digitalWrite(uint8_t pin, __xdata uint8_t val);
@@ -189,14 +187,14 @@ uint32_t millis(void);
 uint32_t micros(void);
 void delay(uint32_t ms);
 //void delayMicroseconds(unsigned int us);
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
-unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+//unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+//unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 
-void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
-uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
+//void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder, uint8_t val);
+//uint8_t shiftIn(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder);
 
-void attachInterrupt(uint8_t, void (*)(void), int mode);
-void detachInterrupt(uint8_t);
+void attachInterrupt(uint8_t interruptNum, void (*userFunc)(void), __xdata uint8_t mode);
+void detachInterrupt(uint8_t interruptNum);
 
 void setup(void);
 void loop(void);
@@ -212,7 +210,7 @@ void loop(void);
 
 #ifdef SUPPORT_ALTERNATE_MAPPINGS
 // helper function for STM8S: switch to the alternate pin functions
-void alternateFunction(uint8_t val);
+//void alternateFunction(uint8_t val);
 #endif
 
 
@@ -228,17 +226,17 @@ void alternateFunction(uint8_t val);
 
 //#define word(...) makeWord(__VA_ARGS__)
 
-unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
-unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
+//unsigned long pulseIn(uint8_t pin, uint8_t state, unsigned long timeout);
+//unsigned long pulseInLong(uint8_t pin, uint8_t state, unsigned long timeout);
 
-void tone(uint8_t _pin, unsigned int frequency, unsigned long duration);
-void noTone(uint8_t _pin);
+//void tone(uint8_t _pin, unsigned int frequency, unsigned long duration);
+//void noTone(uint8_t _pin);
 
 // WMath prototypes
 long random(long howbig);
-long random_minmax(long howsmall, long howbig);
+long random_minmax(long howsmall, __xdata long howbig);
 void randomSeed(unsigned long seed);
-long map(long x, long in_min, long in_max, long out_min, long out_max);
+long map(long x, __xdata long in_min, __xdata long in_max, __xdata long out_min, __xdata long out_max);
 
 inline unsigned int makeWord(unsigned char h, unsigned char l) { return (h << 8) | l; }
 
@@ -275,7 +273,9 @@ char USBSerial_read();
 #define USBSerial_print_i(P) ( Print_print_i(USBSerial_write,(P)) )
 #define USBSerial_print_u(P) ( Print_print_u(USBSerial_write,(P)) )
 #define USBSerial_print_ib(P) ( Print_print_ib(USBSerial_write,(P)) )
-#define USBSerial_print_ub(P) ( Print_print_ub(USBSerial_write,(P)) )
+#define USBSerial_print_ub(P,Q) ( Print_print_ub(USBSerial_write,(P),(Q)) )
+#define USBSerial_print_f(P) ( Print_print_f(USBSerial_write,(P)) )
+#define USBSerial_print_fd(P,Q) ( Print_print_fd(USBSerial_write,(P),(Q)) )
 
 #define USBSerial_println() ( Print_println(USBSerial_write) )
 #define USBSerial_println_s(P) ( Print_print_s(USBSerial_write,(P)) + Print_println(USBSerial_write) )
@@ -283,7 +283,9 @@ char USBSerial_read();
 #define USBSerial_println_i(P) ( Print_print_i(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_u(P) ( Print_print_u(USBSerial_write,(P)) + Print_println(USBSerial_write) )
 #define USBSerial_println_ib(P) ( Print_print_ib(USBSerial_write,(P)) + Print_println(USBSerial_write) )
-#define USBSerial_println_ub(P) ( Print_print_ub(USBSerial_write,(P)) + Print_println(USBSerial_write) )
+#define USBSerial_println_ub(P,Q) ( Print_print_ub(USBSerial_write,(P),(Q)) + Print_println(USBSerial_write) )
+#define USBSerial_println_f(P) ( Print_print_f(USBSerial_write,(P)) + Print_println(USBSerial_write) )
+#define USBSerial_println_fd(P,Q) ( Print_print_fd(USBSerial_write,(P),(Q) ) + Print_println(USBSerial_write) )
 
 
 #define Serial0_print_s(P) ( Print_print_s(Serial0_write,(P)) )
@@ -291,7 +293,9 @@ char USBSerial_read();
 #define Serial0_print_i(P) ( Print_print_i(Serial0_write,(P)) )
 #define Serial0_print_u(P) ( Print_print_u(Serial0_write,(P)) )
 #define Serial0_print_ib(P) ( Print_print_ib(Serial0_write,(P)) )
-#define Serial0_print_ub(P) ( Print_print_ub(Serial0_write,(P)) )
+#define Serial0_print_ub(P,Q) ( Print_print_ub(Serial0_write,(P),(Q)) )
+#define Serial0_print_f(P) ( Print_print_f(Serial0_write,(P)) )
+#define Serial0_print_fd(P,Q) ( Print_print_fd(Serial0_write,(P),(Q)) )
 
 #define Serial0_println() ( Print_println(Serial0_write) )
 #define Serial0_println_s(P) ( Print_print_s(Serial0_write,(P)) + Print_println(Serial0_write) )
@@ -299,7 +303,9 @@ char USBSerial_read();
 #define Serial0_println_i(P) ( Print_print_i(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_u(P) ( Print_print_u(Serial0_write,(P)) + Print_println(Serial0_write) )
 #define Serial0_println_ib(P) ( Print_print_ib(Serial0_write,(P)) + Print_println(Serial0_write) )
-#define Serial0_println_ub(P) ( Print_print_ub(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_ub(P,Q) ( Print_print_ub(Serial0_write,(P),(Q)) + Print_println(Serial0_write) )
+#define Serial0_println_f(P) ( Print_print_f(Serial0_write,(P)) + Print_println(Serial0_write) )
+#define Serial0_println_fd(P,Q) ( Print_print_fd(Serial0_write,(P),(Q) ) + Print_println(Serial0_write) )
 
 
 #endif

@@ -53,6 +53,17 @@ void Uart0_ISR(void) __interrupt (INT_NO_UART0)
     }
 }
 
+typedef void (*voidFuncPtr)(void);
+extern __xdata voidFuncPtr intFunc[];
+void INT0_ISR(void) __interrupt (INT_NO_INT0)
+{
+    intFunc[0]();
+}
+void INT1_ISR(void) __interrupt (INT_NO_INT1)
+{
+    intFunc[1]();
+}
+
 int main(void)
 {
 	init();

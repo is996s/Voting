@@ -11,6 +11,9 @@
 
 typedef void (*voidFuncPtr)(void);
 
+#define EXTERNAL_INT_0 0
+#define EXTERNAL_INT_1 1
 
+#define EXTERNAL_NUM_INTERRUPTS 2
 
 #endif
