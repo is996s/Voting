@@ -124,6 +124,7 @@ Unlike AVR chips, CH55x will reset when the RST pin is High. The reset pin may b
 
 ## Known issues
 
+.
 
 ## Included libraries
 
@@ -157,6 +158,6 @@ guide](https://tenbaht.github.io/sduino/api/migration/) for an overview.
 Arduino IDE versions 1.8.12 are tested, but
 most versions >=1.6.6 should work.
 
-* Windows: Tested on Windows 7. Ch55xduino should work on XP (not tested).
+* Windows: Tested on Windows 7 and XP.
 
 * MacOS: tested on 10.14.
