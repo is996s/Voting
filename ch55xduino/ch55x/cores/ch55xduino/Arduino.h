@@ -133,8 +133,6 @@ void yield(void);
 #define lowByte(w) ((uint8_t) ((w) & 0xff))
 #define highByte(w) ((uint8_t) ((w) >> 8))
 
-//#define bitSet(value, bit) (__asm__("bset\t"))
-//#define bitClear(value, bit) (__asm__("bres\t"))
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 #define bitSet(value, bit) ((value) |= (1UL << (bit)))
 #define bitClear(value, bit) ((value) &= ~(1UL << (bit)))
@@ -149,19 +147,8 @@ void yield(void);
 #define _NOP() do { __asm__ volatile ("nop"); } while (0)
 #endif
 
-/* for SDCC this is supposed to be "__critical{" and "}", but up to
- * sdcc version 3.6.4 it is wrongly implemented. */
-/* so geht es nicht:
-#define BEGIN_CRITICAL		__asm__("push\tcc");__asm__("sim");
-#define END_CRITICAL		__asm__("pop\tcc");
-*/
 #define BEGIN_CRITICAL		__critical {
 #define END_CRITICAL		}
-/* klappt:
-#define BEGIN_CRITICAL
-#define END_CRITICAL
-*/
-
 
 
 typedef unsigned int word;
